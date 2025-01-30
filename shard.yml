@@ -1,0 +1,18 @@
+name: faa_project
+version: 0.1.0
+
+authors:
+  - Dominic Sisneros <dsisnero@gmail.com>
+
+targets:
+  faa_project:
+    main: src/faa_project.cr
+
+dependencies:
+  baked_file_system_mounter:
+    github: crystal-china/baked_file_system_mounter
+
+
+crystal: '>= 1.15.0'
+
+license: MIT
