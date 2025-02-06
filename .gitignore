@@ -1,5 +1,6 @@
 /docs/
 /lib/
+!**/lib/**/src/  # ← Add this line to preserve src directories within any lib
 /bin/
 /.shards/
 *.dwarf
