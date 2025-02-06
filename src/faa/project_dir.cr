@@ -10,7 +10,7 @@ class FileStorage
   end
     
 
-  class_getter(baked_files){Dir.glob("../../project_lib/**/*").select{|fname| File.file? fname}.map{|file| BakedFileSystem::BakedFile.new(file)} }
+  class_getter(baked_files) { BakedFileSystem::Loader.load_files("../../project_lib") }
 
   bake_folder "../../project_lib"
 
