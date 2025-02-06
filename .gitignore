@@ -1,6 +1,7 @@
-/docs/
-/lib/
-!**/lib/**/src/**  # ← Note the double ** at end to include ALL contents
+docs/
+lib/*
+!lib/baked_file_system_mounter/src/
+!lib/baked_file_system_mounter/src/**
 /bin/
 /.shards/
 *.dwarf
