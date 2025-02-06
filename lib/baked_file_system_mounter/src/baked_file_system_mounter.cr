@@ -46,6 +46,16 @@ module BakedFileSystemMounter
           end
         {% end %}
       end
+
+      def self.baked_files
+        {% begin %}
+          [
+            {% for idx in 0...i %}
+              @@baked_files_{{idx}},
+            {% end %}
+          ].flatten
+        {% end %}
+      end
     end
   end
 end

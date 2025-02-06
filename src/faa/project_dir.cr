@@ -10,7 +10,7 @@ class FileStorage
   end
     
 
-  class_getter(baked_files) { BakedFileSystem::Loader.load_files("../../project_lib") }
+  class_getter(baked_files) { BakedFileSystemMounter::BakedFileSystemStorage.baked_files }
 
   bake_folder "../../project_lib"
 
