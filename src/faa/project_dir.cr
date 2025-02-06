@@ -8,7 +8,9 @@ module Faa
       "project_lib" => "../../project_lib"
     })
 
-    class_getter baked_files : Array(BakedFileSystem::BakedFile) do
+    @@baked_files : Array(BakedFileSystem::BakedFile)? = nil
+
+    class_getter(baked_files) = begin
       BakedFileSystemMounter::BakedFileSystemStorage.baked_files
     end
 
