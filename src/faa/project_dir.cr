@@ -34,6 +34,10 @@ end
 module Faa
 
   class ProjectDir
+    BakedFileSystemMounter.assemble({
+      "project_lib" => "../../project_lib"
+    })
+
     getter dir : Path
 
     def initialize(@dir)
