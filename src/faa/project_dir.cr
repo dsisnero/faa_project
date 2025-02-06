@@ -8,10 +8,10 @@ module Faa
       "project_lib" => "../../project_lib"
     })
 
-    @@baked_files : Array(BakedFileSystem::BakedFile)? = nil
+    @@backed_files : Array[String]?
 
-    class_getter(baked_files) do
-      @@baked_files ||= BakedFileSystemMounter::BakedFileSystemStorage.baked_files
+    class_getter baked_files do
+      BakedFileSystemMounter::BakedFileSystemStorage.baked_files_0
     end
 
     getter dir : Path
