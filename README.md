@@ -1,18 +1,45 @@
-# faa_project
+# FAA Project Directory Generator
 
-TODO: Write a description here
+A Crystal tool for generating standardized FAA project directory structures with recommended file templates.
 
 ## Installation
 
-TODO: Write installation instructions here
+1. Add the dependency to your `shard.yml`:
+
+```yaml
+dependencies:
+  faa_project:
+    github: dsisnero/faa_project
+```
+
+2. Run `shards install`
 
 ## Usage
 
-TODO: Write usage instructions here
+```crystal
+require "faa_project"
+
+# Create a new project directory
+project = Faa::ProjectDir.new(Path["./my_faa_project"])
+project.make_subdirectories
+```
+
+This will create a standardized FAA project structure with the following directories:
+
+- 01 - Planning
+- 02 - Engineering
+- 04 - ORM
+- 05 - Construction
+- 06 - Installation
+- 07 - Closeout
+
+Each directory includes recommended file templates and PDF guides.
 
 ## Development
 
-TODO: Write development instructions here
+1. Clone the repository
+2. Run `shards install`
+3. Run specs with `crystal spec`
 
 ## Contributing
 
