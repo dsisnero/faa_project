@@ -1,21 +1,24 @@
 require "./project_dir"
 require "baked_file_system"
 require "baked_file_system_mounter"
+require "log"
 
 module Faa
+  class FileStorage
+    extend BakedFileSystem
+
+    bake_folder "../../project_lib"
+
+    class_getter baked_files : Array(String) = ::Dir.glob("../../project_lib/**/*").select { |file| File.file? file }
+  end
+
   class ProjectDir
-    BakedFileSystemMounter.assemble({
-      "project_lib" => "../../project_lib"
-    })
-
-    @@baked_files : Array(BakedFileSystem::BakedFile) = 
-      BakedFileSystemMounter::BakedFileSystemStorage.baked_files_0
-
-    class_getter baked_files : Array(BakedFileSystem::BakedFile)
+    Logger = Log.for(self)
 
     getter dir : Path
 
-    def initialize(@dir)
+    def initialize(dir : Path | String)
+      @dir = Path.new(dir)
     end
 
     def empty?
@@ -26,16 +29,17 @@ module Faa
     # make them a subdirectory of dir
     def make_subdirectories
       return unless empty?
-      
-      self.class.baked_files.each do |file|
-        target_path = dir / file.path
-        FileUtils.mkdir_p(target_path.dirname)
-        File.write(target_path, file_contents(file))
+      base = Path.new(dir)
+      FileStorage.baked_files.each do |fname|
+        path = base / fname
+        dir = path.parent
+        unless File.directory? dir
+          Logger.debug { "making dir #{dir}" }
+          FileUtils.mkdir_p(dir)
+        end
+        contents = FileStorage.get(fname).gets_to_end
+        File.write(path, contents)
       end
-    end
-
-    private def file_contents(file)
-      String.new(file.io.to_slice)
     end
   end
 end
