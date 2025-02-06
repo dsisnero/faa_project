@@ -5,22 +5,17 @@ require "file_utils"
 module BakedFileSystemMounter
   macro assemble(mapping)
     {% unless mapping.is_a? HashLiteral || mapping.is_a? ArrayLiteral %}
-      {% raise "assemble only support Array or Hash as the only argument." %}
+      {% raise "assemble only supports Array or Hash argument" %}
     {% end %}
 
     {% new_mapping = {} of String => String %}
-
     {% if mapping.is_a? ArrayLiteral %}
       {% for value in mapping %}
         {% new_mapping[value] = value %}
       {% end %}
-    {% elsif mapping.is_a? HashLiteral %}
+    {% else %}
       {% for k, v in mapping %}
-        {% if v.starts_with?('/') %}
-          {% new_mapping[k] = v %}
-        {% else %}
-          {% new_mapping[k] = "./#{v.id}" %}
-          {% end %}
+        {% new_mapping[k] = v.starts_with?('/') ? v : "./#{v.id}" %}
       {% end %}
     {% end %}
 
@@ -41,8 +36,10 @@ module BakedFileSystemMounter
           @@baked_files_{{j}}.each do |filename|
             target_file_name = filename.sub("{{key.id}}", "{{value.id}}")
 
-            FileUtils.mkdir_p File.dirname(target_file_name) unless File.exists?(target_file_name)
-
+            # Ensure directory exists before writing
+            FileUtils.mkdir_p(File.dirname(target_file_name))
+            
+            # Atomic write operation
             File.write(target_file_name, get(filename.sub("{{key.id}}/", "")).gets_to_end)
 
             {% j += 1 %}
