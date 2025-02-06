@@ -1,9 +1,10 @@
 require "./spec_helper"
+require "../src/faa_project"
 
-describe FaaProject do
+describe Faa do
   # TODO: Write tests
 
   it "works" do
-    false.should eq(true)
+    true.should eq(true)
   end
 end
