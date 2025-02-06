@@ -1,10 +1,38 @@
-require "baked_file_system_mounter"
+require "./project_dir"
+require "baked_file_system"
 
-BakedFileSystemMounter.assemble(
-  {"project_lib" => "#{Faa::PROJECT_LIB}"}
-)
+class FileStorage
+  Logger = Log.for(self)
+  extend BakedFileSystem
+
+  @@baked_files : Array(BakedFileSystem::BakedFile) = begin
+    [] of BakedFileSystem::BakedFile
+  end
+    
+
+  class_getter(baked_files){Dir.glob("../../project_lib/**/*").select{|fname| File.file? fname}.map{|file| BakedFileSystem::BakedFile.new(file)} }
+
+  bake_folder "../../project_lib"
+
+  def self.copy_to(dir : String | Path)
+    base = Path.new(dir)
+    raise "Not a dir" unless File.directory? base
+    baked_files.each do |file|
+        path = base / file.path
+        dir = path.parent
+        unless File.directory? dir
+          Logger.debug {"making dir #{dir}"}
+          FileUtils.mkdir_p(dir)
+        end
+        File.write(full_path, file.gets_to_end)
+    end
+  end
+end
+
+
 
 module Faa
+
   class ProjectDir
     getter dir : Path
 
@@ -12,27 +40,14 @@ module Faa
     end
 
     def empty?
-      Dir.empty? dir
+      ::Dir.empty? dir
     end
 
     def make_subdirectories
       return unless empty?
-      # Iterate through all entries in the baked filesystem
-      BakedFileSystemMounter.mounts["project_lib"].entries.each do |entry|
-        # Construct the full path by joining the project directory with the entry path
-        full_path = dir / entry.path
-
-        if entry.dir?
-          # If it's a directory, create the directory
-          FileUtils.mkdir_p(full_path)
-        else
-          # If it's a file, create the parent directory and write the file contents
-          FileUtils.mkdir_p(File.dirname(full_path))
-
-          # Write the file contents
-          File.write(full_path, entry.read)
-        end
-      end
+      FileStorage.copy_to(dir)
     end
+
   end
+
 end
