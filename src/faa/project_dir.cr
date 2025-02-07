@@ -3,13 +3,19 @@ require "baked_file_system"
 require "baked_file_system_mounter"
 require "log"
 
+Log.setup_from_env
 module Faa
   class FileStorage
     extend BakedFileSystem
 
+    folder = File.join(__DIR__, "../project_lib")
+
     bake_folder "../../project_lib"
 
-    class_getter baked_files : Array(String) = ::Dir.glob("../../project_lib/**/*").select { |file| File.file? file }
+    class_getter baked_files : Array(String) = begin
+     path = File.join(__DIR__,"../../project_lib")
+     ::Dir.glob("#{path}/**/*").select { |file| File.file? file }.map{|f| f.sub(path,"")}
+    end
   end
 
   class ProjectDir
@@ -33,6 +39,7 @@ module Faa
       FileStorage.baked_files.each do |fname|
         path = base / fname
         dir = path.parent
+        Logger.debug { "dir #[dir} : path #{path}]"}
         unless File.directory? dir
           Logger.debug { "making dir #{dir}" }
           FileUtils.mkdir_p(dir)

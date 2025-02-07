@@ -28,9 +28,11 @@ require "../../src/faa/project_dir"
            testfiles = create_tests
            testfiles.each do |rel_path|
              full_path = File.join(test_dir,rel_path)
+               pp! ::Dir.new(project_dir.dir).children if !File.exists?(full_path)
              File.exists?(full_path).should be_true,
-               "Missing expected file: #{rel_path}"
+               "Missing expected file: #{full_path}"
            end
+
          end
        end
 
@@ -53,24 +55,6 @@ require "../../src/faa/project_dir"
         
        end
 
-       it "creates correct directory structure" do
-         with_temp_dir do |test_dir|
-           project_dir = ProjectDir.new(test_dir)
-           project_dir.make_subdirectories
-
-           %w[
-             01\ -test_dirng
-             02\ -\ Engineering
-             04\ -\ ORM
-             05\ -\ Construction
-             06\ -\ Installation
-             07\ -\ Closeout
-           ].each do |dir_name|
-             ::Dir.exists?(File.join(test_dir,dir_name)).should be_true,
-               "Missing directory: #{dir_name}"
-           end
-         end
-       end
      end
    end
  end

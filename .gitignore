@@ -1,6 +1,5 @@
 docs/
 lib/
-!lib/baked_file_system_mounter/src/
 /bin/
 /.shards/
 *.dwarf
