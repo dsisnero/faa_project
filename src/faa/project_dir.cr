@@ -1,9 +1,9 @@
 require "./project_dir"
 require "baked_file_system"
-require "baked_file_system_mounter"
 require "log"
 
 Log.setup_from_env
+
 module Faa
   class FileStorage
     extend BakedFileSystem
@@ -11,11 +11,6 @@ module Faa
     folder = File.join(__DIR__, "../project_lib")
 
     bake_folder "../../project_lib"
-
-    class_getter baked_files : Array(String) = begin
-     path = File.join(__DIR__,"../../project_lib")
-     ::Dir.glob("#{path}/**/*").select { |file| File.file? file }.map{|f| f.sub(path,"")}
-    end
   end
 
   class ProjectDir
@@ -36,15 +31,17 @@ module Faa
     def make_subdirectories
       return unless empty?
       base = Path.new(dir)
-      FileStorage.baked_files.each do |fname|
-        path = base / fname
+      # files_in_storage = FileStorage.files.map(&.path)
+      # pp! files_in_storage
+      FileStorage.files.each do |file|
+        path = base / file.path
         dir = path.parent
-        Logger.debug { "dir #[dir} : path #{path}]"}
+        Logger.debug { "dir #[dir} : path #{path}]" }
         unless File.directory? dir
           Logger.debug { "making dir #{dir}" }
           FileUtils.mkdir_p(dir)
         end
-        contents = FileStorage.get(fname).gets_to_end
+        contents = file.gets_to_end
         File.write(path, contents)
       end
     end
