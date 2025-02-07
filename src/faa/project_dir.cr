@@ -8,8 +8,6 @@ module Faa
   class FileStorage
     extend BakedFileSystem
 
-    folder = File.join(__DIR__, "../project_lib")
-
     bake_folder "../../project_lib"
   end
 

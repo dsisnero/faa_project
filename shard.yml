@@ -9,9 +9,9 @@ targets:
     main: src/faa_project.cr
 
 dependencies:
-  baked_file_system_mounter:
-    github: crystal-china/baked_file_system_mounter
-
+  baked_file_system:
+    github: schovi/baked_file_system
+    branch: master
 
 crystal: '>= 1.15.0'
 
