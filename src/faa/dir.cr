@@ -17,6 +17,8 @@ module Faa
     log_to_stderr: true
   )
 
+  # dir = Faa::Dir.new
+  # proj_dir = dir.find_or_create_project_dir(state: "Utah", jcn: "25007236")
   class Dir
     Logger = Log.for(self)
     # property state : String
@@ -38,9 +40,6 @@ module Faa
       @one_drive = home / "OneDrive - Federal Aviation Administration"
       @active_project_lib = one_drive / "Active Project Library"
       FileUtils.mkdir_p LOG_DIR
-    end
-
-    def create_dirs
     end
 
     def directory_from_state_abbrv(abbrev : String)
@@ -86,7 +85,7 @@ module Faa
       "#{lid.upcase} (#{city})"
     end
 
-    def find_dir_or_file(base = active_project_lib, not_found = nil, depth : Int32? = nil, & : FastFind::Entry -> Bool)
+    private def find_dir_or_file(base = active_project_lib, not_found = nil, depth : Int32? = nil, & : FastFind::Entry -> Bool)
       # Configure depth if provided
       config = fast_find_config.dup
       config.max_depth = depth if depth
@@ -132,23 +131,3 @@ module Faa
     end
   end
 end
-
-dir = Faa::Dir.new
-proj_dir = dir.find_or_create_project_dir(state: "Utah", jcn: "25007236")
-pp! proj_dir
-
-# proj = Faa::Dir.new
-# puts "home: #{proj.home} #{Dir.exists? proj.home}"
-# puts "one_drive: #{proj.one_drive} exists: #{Dir.exists? proj.one_drive}"
-# puts "active_project_lib: #{proj.active_project_lib} exists: #{Dir.exists? proj.active_project_lib}"
-# proj.active_project_lib
-
-# utah = proj.find_dir_or_file() do |entry|
-#   (entry.not_nil!.directory?) && (entry.not_nil!.path.to_s.downcase.includes?("utah"))
-# end
-# # utah = proj.find_dir_or_file{ |d| d =~ /utah/i}
-# puts "utah #{utah}"
-# pp! utah
-# dir = proj.find_dir_or_file{ |d| d =~ /ogd/i }
-# pp! dir
-# puactive_project_libts "project dir #{dir}"

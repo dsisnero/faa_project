@@ -35,12 +35,8 @@ module Faa
         path = base / file.path
         dir = path.parent
         Logger.debug { "dir #[dir} : path #{path}]" }
-        unless File.directory? dir
-          Logger.debug { "making dir #{dir}" }
-          FileUtils.mkdir_p(dir)
-        end
-        contents = file.gets_to_end
-        File.write(path, contents)
+        FileUtils.mkdir_p(dir) unless File.directory? dir
+        File.write(path, file.gets_to_end) unless File.exists? path
       end
     end
   end
