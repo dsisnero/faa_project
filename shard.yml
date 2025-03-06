@@ -12,6 +12,9 @@ dependencies:
   baked_file_system:
     github: schovi/baked_file_system
     branch: master
+  xdg:
+    github: GeopJr/crystal-xdg
+    version: ~> 0.1.0
 
 crystal: '>= 1.15.0'
 
