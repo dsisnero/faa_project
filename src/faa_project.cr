@@ -5,3 +5,4 @@ module Faa
 end
 
 require "./faa/dir"
+require "./faa/utils"
