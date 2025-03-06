@@ -1,6 +1,6 @@
-require "xdg"
 require "yaml"
 require "file_utils"
+require "xdg"
 
 module Faa
   class Config
@@ -9,17 +9,18 @@ module Faa
     @[YAML::Field]
     property active_project_library : String? = nil
 
-    @[YAML::Field]
+    @[YAML::Field] 
     property working_project_directory : String? = nil
 
     def self.load : Config
-      config_path = File.join(xdg_config_dir, "config.yml")
+      XDG.ensure_directories
+      config_file = File.join(XDG.config_home, "faa_project", "config.yml")
       
-      if File.exists?(config_path)
+      if File.exists?(config_file)
         begin
-          Config.from_yaml(File.read(config_path))
-        rescue e
-          new.tap(&.save) # Create new config if existing is corrupt
+          Config.from_yaml(File.read(config_file))
+        rescue
+          new.tap(&.save)
         end
       else
         new.tap(&.save)
@@ -27,18 +28,9 @@ module Faa
     end
 
     def save
-      FileUtils.mkdir_p(File.dirname(config_path))
-      File.write(config_path, to_yaml)
-    end
-
-    private def config_path
-      File.join(self.class.xdg_config_dir, "config.yml")
-    end
-
-    private def self.xdg_config_dir : String
-      XDG.config.find("faa_project").first.to_s.tap do |path|
-        FileUtils.mkdir_p(path)
-      end
+      config_dir = File.join(XDG.config_home, "faa_project")
+      FileUtils.mkdir_p(config_dir)
+      File.write(File.join(config_dir, "config.yml"), to_yaml)
     end
   end
 end
