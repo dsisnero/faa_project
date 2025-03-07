@@ -4,6 +4,13 @@ require "xdg"
 
 module Faa
   class Config
+
+    class_getter(dir) {XDG.app_config("faa_project") }
+
+    def self.dir
+      XDG.app_config("faa_project")
+    end
+      
     include YAML::Serializable
 
     @[YAML::Field]
@@ -14,7 +21,7 @@ module Faa
 
     def self.load : Config
       XDG.ensure_directories
-      config_file = File.join(XDG.config_home, "faa_project", "config.yml")
+      config_file = File.join(Config.dir, "config.yml")
       
       if File.exists?(config_file)
         begin
@@ -28,9 +35,9 @@ module Faa
     end
 
     def save
-      config_dir = File.join(XDG.config_home, "faa_project")
-      FileUtils.mkdir_p(config_dir)
-      File.write(File.join(config_dir, "config.yml"), to_yaml)
+      FileUtils.mkdir_p(Config.dir)
+      File.write(File.join(Config.dir, "config.yml"), to_yaml)
     end
+
   end
 end
