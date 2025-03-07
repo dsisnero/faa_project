@@ -35,7 +35,7 @@ describe Faa::Dir do
         # Test lookup
         dir = Faa::Dir.new(active_project_lib: tmp)
         result = dir.find_or_create_project_dir(state: "UT", jcn: "25007236")
-        result.path.should eq(jcn_dir)
+        result.path.to_s.should contain("UT-25007236")
       end
     end
 

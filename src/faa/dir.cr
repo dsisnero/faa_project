@@ -73,14 +73,23 @@ module Faa
     def find_or_create_project_dir(state : String, jcn : String, city : String? = nil, locid : String? = nil)
       state_path = active_project_lib / state
       path = find_dir_or_file(base: state_path) do |entry|
-        entry.path.to_s.downcase.includes?(jcn)
+        entry.path.to_s.downcase.includes?(jcn.downcase)
       end
-      return ProjectDir.new(path.path) if path
-      create_project_dir(state_path, city, locid, jcn)
+      
+      if path
+        ProjectDir.new(path.path)
+      else
+        create_project_dir(state_path, city, locid, jcn)
+      end
     end
 
     def create_project_dir(state_path : Path, city : String? = nil, locid : String? = nil, jcn : String? = nil)
-      puts "creating project dir"
+      dir_name = "#{locid} (#{city})" if locid && city
+      dir_name ||= jcn ? "JCN-#{jcn}" : "UNKNOWN"
+      
+      project_path = state_path / dir_name
+      Dir.mkdir_p(project_path)
+      ProjectDir.new(project_path)
     end
 
     def lid_dir_name(lid : String, city : String)
