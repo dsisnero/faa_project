@@ -19,6 +19,28 @@ module Faa
     @[YAML::Field] 
     property working_project_directory : String? = nil
 
+    def initialize
+      @active_project_library ||= File.join(Path.home, "OneDrive - Federal Aviation Administration", "Active Project Library")
+      @working_project_directory ||= File.join(Path.home, "faa_workspace")
+    end
+
+    # Add helper method to get concrete paths
+    def active_project_library_path
+      Path.new(@active_project_library || default_active_path)
+    end
+
+    def working_project_directory_path
+      Path.new(@working_project_directory || default_working_path)
+    end
+
+    private def default_active_path
+      Path.home / "OneDrive - Federal Aviation Administration" / "Active Project Library"
+    end
+
+    private def default_working_path
+      Path.home / "faa_workspace"
+    end
+
     def self.load : Config
       XDG.ensure_directories
       config_file = File.join(Config.dir, "config.yml")

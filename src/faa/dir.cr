@@ -3,6 +3,7 @@ require "log"
 require "./logging"
 require "./fast_find"
 require "./project_dir"
+require "./config"
 
 # TODO: Write documentation for `FaaProject`
 module Faa
@@ -27,18 +28,19 @@ module Faa
 
     # property jcn : String
 
-    getter home : Path
-
-    getter one_drive : Path
-
     getter active_project_lib : Path
+    
+    getter working_dir : Path
 
     getter(fast_find_config) { FastFind::Config.new }
 
-    def initialize
-      @home = Path.home
-      @one_drive = home / "OneDrive - Federal Aviation Administration"
-      @active_project_lib = one_drive / "Active Project Library"
+    def initialize(
+      active_project_lib : String | Path | Nil = nil,
+      working_dir : String | Path | Nil = nil
+    )
+      config = Config.load
+      @active_project_lib = active_project_lib ? Path.new(active_project_lib.to_s) : config.active_project_library_path
+      @working_dir = working_dir ? Path.new(working_dir.to_s) : config.working_project_directory_path
       FileUtils.mkdir_p LOG_DIR
     end
 
