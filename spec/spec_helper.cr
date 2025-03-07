@@ -7,3 +7,6 @@ def with_temp_dir(path : String? = nil, &)
   yield path
   FileUtils.rm_rf(path)
 end
+
+require "./faa/dir_spec"
+require "./faa/utils_spec"
