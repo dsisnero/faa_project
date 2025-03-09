@@ -51,7 +51,7 @@ describe Faa::Dir do
 
         expected_path = File.join(tmp, "UT", "OGD (Ogden)")
         Dir.exists?(expected_path).should be_true
-        result.path.should eq(expected_path)
+        result.path.should eq(Path.new(expected_path))
       end
     end
   end

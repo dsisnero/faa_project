@@ -24,7 +24,12 @@ describe Faa::Utils do
     it "raises error on invalid zip files" do
       with_temp_dir do |tmp|
         invalid_zip = File.join(tmp, "corrupt.zip")
-        File.write(invalid_zip, "invalid data")
+        
+        # Create a file with valid zip header but corrupt content
+        File.open(invalid_zip, "w") do |f|
+          f.write Bytes[0x50, 0x4B, 0x03, 0x04, 0x00, 0x00] # Valid header
+          f.write "corrupted content".to_slice
+        end
 
         expect_raises(Faa::Error, /Failed to unzip/) do
           Faa::Utils.unzip(invalid_zip, tmp)

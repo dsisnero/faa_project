@@ -24,8 +24,10 @@ module Faa
         end
       end
     end
-  rescue ex
+  rescue ex : Compress::Zip::Error | File::NotFoundError
     raise Error.new("Failed to unzip #{zip_path}: #{ex.message}")
+  rescue ex
+    raise Error.new("Unzip error: #{ex.message}")
   end
 end
 end
