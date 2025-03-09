@@ -29,7 +29,7 @@ module Faa
     # property jcn : String
 
     getter active_project_lib : Path
-    
+
     getter working_dir : Path
 
     getter(fast_find_config) { FastFind::Config.new }
@@ -75,7 +75,7 @@ module Faa
       path = find_dir_or_file(base: state_path) do |entry|
         entry.path.to_s.downcase.includes?(jcn.downcase)
       end
-      
+
       if path
         ProjectDir.new(path.path)
       else
@@ -86,7 +86,7 @@ module Faa
     def create_project_dir(state_path : Path, city : String? = nil, locid : String? = nil, jcn : String? = nil)
       dir_name = "#{locid} (#{city})" if locid && city
       dir_name ||= jcn ? "JCN-#{jcn}" : "UNKNOWN"
-      
+
       project_path = state_path / dir_name
       ::Dir.mkdir_p(project_path)
       ProjectDir.new(project_path)

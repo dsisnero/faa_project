@@ -14,7 +14,7 @@ describe Faa::Utils do
         end
 
         Faa::Utils.unzip(zip_path, output_dir)
-        
+
         # Verify extraction
         File.read(File.join(output_dir, "test.txt")).should eq("content")
         File.read(File.join(output_dir, "nested/file.txt")).should eq("nested")
@@ -24,7 +24,7 @@ describe Faa::Utils do
     it "raises error on invalid zip files" do
       with_temp_dir do |tmp|
         invalid_zip = File.join(tmp, "corrupt.zip")
-        
+
         # Create a file with valid zip header but corrupt content
         File.open(invalid_zip, "w") do |f|
           f.write Bytes[0x50, 0x4B, 0x03, 0x04, 0x00, 0x00] # Valid header

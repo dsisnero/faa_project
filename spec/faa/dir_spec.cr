@@ -43,7 +43,7 @@ describe Faa::Dir do
       with_temp_dir do |tmp|
         dir = Faa::Dir.new(active_project_lib: tmp)
         result = dir.find_or_create_project_dir(
-          state: "UT", 
+          state: "UT",
           jcn: "25007236",
           city: "Ogden",
           locid: "OGD"

@@ -25,7 +25,7 @@ module Faa
           testfiles = create_tests
           testfiles.each do |rel_path|
             full_path = File.join(test_dir, rel_path)
-            pp! ::Dir.new(project_dir.dir).children if !File.exists?(full_path)
+            pp! ::Dir.new(project_dir.path).children if !File.exists?(full_path)
             File.exists?(full_path).should be_true,
               "Missing expected file: #{full_path}"
           end
