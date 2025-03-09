@@ -14,21 +14,21 @@ module Faa
   class ProjectDir
     Logger = Log.for(self)
 
-    getter dir : Path
+    getter path : Path
 
-    def initialize(dir : Path | String)
-      @dir = Path.new(dir)
+    def initialize(path : Path | String)
+      @path = Path.new(path)
     end
 
     def empty?
-      ::Dir.empty? dir
+      ::Dir.empty? path
     end
 
     # make project directories and files using the project_lib files
     # make them a subdirectory of dir
     def make_subdirectories
       return unless empty?
-      base = Path.new(dir)
+      base = Path.new(path)
       # files_in_storage = FileStorage.files.map(&.path)
       # pp! files_in_storage
       FileStorage.files.each do |file|
