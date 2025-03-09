@@ -88,7 +88,7 @@ module Faa
       dir_name ||= jcn ? "JCN-#{jcn}" : "UNKNOWN"
       
       project_path = state_path / dir_name
-      Dir.mkdir_p(project_path)
+      ::Dir.mkdir_p(project_path)
       ProjectDir.new(project_path)
     end
 
