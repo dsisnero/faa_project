@@ -1,6 +1,9 @@
 require "compress/zip"
 
-module Faa::Utils
+module Faa
+  class Error < Exception; end
+  
+  module Utils
   extend self
 
   def unzip(zipfile : String | Path, outdir : String | Path) : Nil
@@ -24,4 +27,5 @@ module Faa::Utils
   rescue ex
     raise Error.new("Failed to unzip #{zip_path}: #{ex.message}")
   end
+end
 end
