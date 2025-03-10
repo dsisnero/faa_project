@@ -10,3 +10,4 @@ end
 
 require "./faa/dir_spec"
 require "./faa/utils_spec"
+require "./faa/cli_spec"
