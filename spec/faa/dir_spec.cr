@@ -1,4 +1,5 @@
 require "../spec_helper"
+require "../../src/faa/dir"
 
 describe Faa::Dir do
   around_each do |test|
