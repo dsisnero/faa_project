@@ -14,6 +14,11 @@ dependencies:
     branch: master
   xdg:
     github: dsisnero/xdg
+  cling:
+    github: devnote-dev/cling
+    version: ">= 3.0.0"
+  term-prompt:
+    github: crystal-term/prompt
 
 crystal: '>= 1.15.0'
 

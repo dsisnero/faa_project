@@ -36,7 +36,7 @@ module Faa
 
     def initialize(
       active_project_lib : String | Path | Nil = nil,
-      working_dir : String | Path | Nil = nil
+      working_dir : String | Path | Nil = nil,
     )
       config = Config.load
       @active_project_lib = active_project_lib ? Path.new(active_project_lib.to_s) : config.active_project_library_path
@@ -70,7 +70,7 @@ module Faa
     #   result || not_found
     # end
 
-    def find_or_create_project_dir(state : String, jcn : String, city : String? = nil, locid : String? = nil)
+    def find_or_create_project_dir(state : String, jcn : String, city : String? = nil, locid : String? = nil, factype : String? = nil, title : String? = nil)
       state_path = active_project_lib / state
       path = find_dir_or_file(base: state_path) do |entry|
         entry.path.to_s.downcase.includes?(jcn.downcase)
@@ -79,15 +79,26 @@ module Faa
       if path
         ProjectDir.new(path.path)
       else
-        create_project_dir(state_path, city, locid, jcn)
+        create_project_dir(state_path, city, locid, jcn, factype, title)
       end
     end
 
-    def create_project_dir(state_path : Path, city : String? = nil, locid : String? = nil, jcn : String? = nil)
-      dir_name = "#{locid} (#{city})" if locid && city
-      dir_name ||= jcn ? "JCN-#{jcn}" : "UNKNOWN"
+    def city_locid_dirname(city : String, locid : String)
+      "#{locid} (#{city.upcase})"
+    end
 
-      project_path = state_path / dir_name
+    def project_dir_name(locid, factype, jcn, title : String? = nil)
+      String.build do |s|
+        s << "#{locid} #{factype} - "
+        s << "#{title} - " if title
+        s << jcn
+      end
+    end
+
+    def create_project_dir(state_path : Path, city : String, locid : String, jcn : String, factype : String, title : String? = nil)
+      locid_city_path = state_path / city_locid_dirname(city, locid)
+      project_path = locid_city_path / project_dir_name(locid, factype, jcn, title)
+
       ::Dir.mkdir_p(project_path)
       ProjectDir.new(project_path)
     end

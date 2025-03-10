@@ -6,6 +6,9 @@ end
 
 require "./faa/dir"
 require "./faa/utils"
-require "./faa/cli"
-
-Faa::CLI.run(ARGV)
+require "./faa/app"
+begin
+  Faa::App.new.execute(ARGV)
+rescue
+  exit 1
+end

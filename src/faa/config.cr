@@ -39,7 +39,7 @@ module Faa
 
     def self.load : Config
       config_file = File.join(dir, "config.yml")
-      
+
       if File.exists?(config_file)
         begin
           return from_yaml(File.read(config_file))
@@ -47,7 +47,7 @@ module Faa
           Log.error { "Invalid config file: #{ex.message}" }
         end
       end
-      
+
       new.tap(&.save)
     end
 

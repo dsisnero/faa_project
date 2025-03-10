@@ -11,7 +11,7 @@ describe Faa::Config do
     it "creates new config with defaults when missing" do
       with_temp_dir do |tmp|
         Faa::Config.dir = tmp
-        
+
         config = Faa::Config.load
         config.active_project_library_path.should eq(config.default_active_path)
         config.working_project_directory_path.should eq(config.default_working_path)
@@ -37,7 +37,7 @@ describe Faa::Config do
       with_temp_dir do |tmp|
         Faa::Config.dir = tmp
         File.write(File.join(tmp, "config.yml"), "invalid: yaml: here")
-        
+
         config = Faa::Config.load
         config.active_project_library_path.should eq(config.default_active_path)
       end

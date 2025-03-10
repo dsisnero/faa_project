@@ -18,6 +18,7 @@ module Faa
 
     def initialize(path : Path | String)
       @path = Path.new(path)
+      make_subdirectories
     end
 
     def empty?
