@@ -1,14 +1,11 @@
 require "yaml"
 require "file_utils"
 require "xdg"
+require "log"
 
 module Faa
   class Config
-    class_getter(dir) { XDG.app_config("faa_project") }
-
-    def self.dir
-      XDG.app_config("faa_project")
-    end
+    class_property dir : String = XDG.app_config("faa_project")
 
     include YAML::Serializable
 
@@ -32,32 +29,35 @@ module Faa
       Path.new(@working_project_directory || default_working_path)
     end
 
-    private def default_active_path
+    def default_active_path
       Path.home / "OneDrive - Federal Aviation Administration" / "Active Project Library"
     end
 
-    private def default_working_path
+    def default_working_path
       Path.home / "faa_workspace"
     end
 
     def self.load : Config
-      XDG.ensure_directories
-      config_file = File.join(Config.dir, "config.yml")
-
+      config_file = File.join(dir, "config.yml")
+      
       if File.exists?(config_file)
         begin
-          Config.from_yaml(File.read(config_file))
-        rescue
-          new.tap(&.save)
+          return from_yaml(File.read(config_file))
+        rescue ex : YAML::ParseException
+          Log.error { "Invalid config file: #{ex.message}" }
         end
-      else
-        new.tap(&.save)
       end
+      
+      new.tap(&.save)
     end
 
     def save
-      FileUtils.mkdir_p(Config.dir)
-      File.write(File.join(Config.dir, "config.yml"), to_yaml)
+      FileUtils.mkdir_p(File.dirname(config_file))
+      File.write(config_file, to_yaml)
+    end
+
+    private def config_file
+      File.join(Config.dir, "config.yml")
     end
   end
 end
