@@ -7,6 +7,13 @@ def with_temp_dir(path : String? = nil, &)
   yield path
   FileUtils.rm_rf(path)
 end
+  def with_temp_env(key, value)
+    original = ENV[key]?
+    ENV[key] = value
+    yield
+  ensure
+    ENV[key] = original
+  end
 
 require "./faa/dir_spec"
 require "./faa/utils_spec"
