@@ -6,3 +6,6 @@ end
 
 require "./faa/dir"
 require "./faa/utils"
+require "./faa/cli"
+
+Faa::CLI.run(ARGV)
