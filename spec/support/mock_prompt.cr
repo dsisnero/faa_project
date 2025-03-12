@@ -18,12 +18,12 @@ class MockPrompt < Faa::Prompt
 end
 
 def with_mocked_prompts(answers = {} of String => String, &block)
-  # Explicitly type the original prompt
-  original_prompt : Faa::Prompt = Faa::Commands::Create.prompt
+  # Get the original prompt and assert it's not nil
+  original_prompt = Faa::Commands::Create.prompt.not_nil!
   
   Faa::Commands::Create.prompt = MockPrompt.new(answers)
   yield
 ensure
-  # Use not_nil! since we know this will be set
-  Faa::Commands::Create.prompt = original_prompt.not_nil!
+  # Now safe to assign directly
+  Faa::Commands::Create.prompt = original_prompt
 end
