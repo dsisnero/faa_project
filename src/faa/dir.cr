@@ -70,7 +70,7 @@ module Faa
     #   result || not_found
     # end
 
-    def find_or_create_project_dir(state : String, jcn : String, city : String? = nil, locid : String? = nil, factype : String? = nil, title : String? = nil)
+    def find_or_create_project_dir(state : String, jcn : String, city : String, locid : String, factype : String, title : String)
       state_path = active_project_lib / state
       path = find_dir_or_file(base: state_path) do |entry|
         entry.path.to_s.downcase.includes?(jcn.downcase)
