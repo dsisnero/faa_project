@@ -31,13 +31,22 @@ ensure
 end
 
 def capture_stderr
-  original_stderr = STDERR
-  stderr = IO::Memory.new
-  STDERR.reopen(stderr)
+  # Create a pipe for capturing output
+  reader, writer = IO.pipe
+  original_stderr = STDERR.dup
+  
+  # Redirect stderr to our pipe writer
+  STDERR.reopen(writer)
   yield
-  stderr.to_s
+  
+  # Close writer and read output
+  writer.close
+  reader.gets_to_end
 ensure
+  # Restore original stderr
   STDERR.reopen(original_stderr)
+  reader.try(&.close)
+  writer.try(&.close)
 end
 
 def capture_exit_code
