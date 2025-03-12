@@ -9,10 +9,10 @@ module Faa
 
     include YAML::Serializable
 
-    @[YAML::Field(type: String)]
+    @[YAML::Field(type: ::String)]
     property active_project_library : String? = nil
 
-    @[YAML::Field(type: String)]
+    @[YAML::Field(type: ::String)]
     property working_project_directory : String? = nil
 
     def initialize
