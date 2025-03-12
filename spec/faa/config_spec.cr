@@ -42,5 +42,21 @@ describe Faa::Config do
         config.active_project_library_path.should eq(config.default_active_path)
       end
     end
+
+    describe "#log_file_path" do
+      it "returns default log path when not configured" do
+        config = Faa::Config.new
+        config.log_file = nil
+        
+        config.log_file_path.should eq(config.default_log_dir.join("faa.log"))
+      end
+
+      it "returns custom log path when configured" do
+        config = Faa::Config.new
+        config.log_file = "/custom/path/to/log.txt"
+        
+        config.log_file_path.should eq(Path["/custom/path/to/log.txt"])
+      end
+    end
   end
 end

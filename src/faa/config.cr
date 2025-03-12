@@ -15,6 +15,9 @@ module Faa
     @[YAML::Field(type: ::String)]
     property working_project_directory : String? = nil
 
+    @[YAML::Field(type: ::String)]
+    property log_file : String? = nil
+
     def initialize
       @active_project_library ||= File.join(Path.home, "OneDrive - Federal Aviation Administration", "Active Project Library")
       @working_project_directory ||= File.join(Path.home, "faa_workspace")
@@ -35,6 +38,18 @@ module Faa
 
     def default_working_path
       Path.home / "faa_workspace"
+    end
+
+    def default_log_dir
+      Path.new(XDG::Cache.new("faa_project").to_s).join("logs")
+    end
+
+    def log_file_path
+      if custom = @log_file
+        Path.new(custom)
+      else
+        default_log_dir.join("faa.log")
+      end
     end
 
     def self.load : Config

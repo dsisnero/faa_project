@@ -3,33 +3,36 @@ require "./log_formatter"
 
 module Faa
   module Logging
+    def self.setup_logging(config : Faa::Config)
+      log_level = ::Log::Severity::Info
+      log_path = config.log_file_path
+      log_to_stderr = true
 
-    def self.setup_logging(
-      log_level : Symbol = :info,
-      file_path : Path? = nil,
-      log_to_stderr : Bool = true,
-    )
-      log_level = ::Log::Severity.parse(log_level.to_s)
+      # Ensure log directory exists
+      FileUtils.mkdir_p(log_path.dirname)
+      
       broadcast_backend = ::Log::BroadcastBackend.new
-      # Create log backend for file if path is provided
-
-      if file_path
-        dirname = file_path.dirname
-        FileUtils.mkdir_p(dirname)
-        log_file = File.open(file_path, "a")
-      else
-        log_file = STDOUT
-      end
-
-      file_backend = ::Log::IOBackend.new(io: log_file, formatter: StdoutLogFormat, dispatcher: ::Log::DirectDispatcher)
-
+      
+      # File backend
+      file_backend = ::Log::IOBackend.new(
+        io: File.open(log_path, "a"),
+        formatter: StdoutLogFormat,
+        dispatcher: ::Log::DirectDispatcher
+      )
       broadcast_backend.append(file_backend, log_level)
 
-      # in_memory_backend = ::Log::InMemoryBackend.instance
-      # broadcast_backend.append(in_memory_backend, log_level)
+      # STDERR backend
+      if log_to_stderr
+        stderr_backend = ::Log::IOBackend.new(
+          io: STDERR,
+          formatter: StdoutLogFormat,
+          dispatcher: ::Log::DirectDispatcher
+        )
+        broadcast_backend.append(stderr_backend, log_level)
+      end
+
       ::Log.setup(log_level, broadcast_backend)
-      target = (path = file_path) ? path.to_s : "stdout"
-      Log.info &.emit("Logger settings", level: log_level.to_s, target: target)
+      ::Log.info &.emit("Logging initialized", path: log_path.to_s)
     end
   end
 end
