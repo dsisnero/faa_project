@@ -5,7 +5,7 @@ require "log"
 
 module Faa
   class Config
-    class_property dir : String = XDG.app_config("faa_project")
+    class_property dir : ::String = XDG.app_config("faa_project")
 
     include YAML::Serializable
 
