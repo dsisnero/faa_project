@@ -7,8 +7,15 @@ describe Faa::Commands::Create do
         with_mocked_prompts do
           command = Faa::Commands::Create.new
           command.run(
-            Cling::Arguments.new(["25007323", "ut"]),
-            Cling::Options.new({"title" => "RTIR SITE PREP"})
+            Cling::Arguments.new({
+              "jcn" => Cling::Argument.new("25007323"),
+              "state" => Cling::Argument.new("ut"),
+              "city" => Cling::Argument.new("TestCity"),
+              "locid" => Cling::Argument.new("TLOC"),
+              "factype" => Cling::Argument.new("Test"),
+              "title" => Cling::Argument.new("RTIR SITE PREP")
+            }),
+            Cling::Options.new
           )
 
           expected = File.join(
@@ -26,11 +33,21 @@ describe Faa::Commands::Create do
       command = Faa::Commands::Create.new
 
       expect_raises(Cling::MissingArguments, /jcn/) do
-        command.run(Cling::Arguments.new(["ut"]), Cling::Options.new)
+        command.run(
+          Cling::Arguments.new({
+            "state" => Cling::Argument.new("ut")
+          }),
+          Cling::Options.new
+        )
       end
 
       expect_raises(Cling::MissingArguments, /state/) do
-        command.run(Cling::Arguments.new(["25007323"]), Cling::Options.new)
+        command.run(
+          Cling::Arguments.new({
+            "jcn" => Cling::Argument.new("25007323")
+          }),
+          Cling::Options.new
+        )
       end
     end
   end
