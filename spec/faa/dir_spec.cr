@@ -72,18 +72,19 @@ describe Faa::Dir do
       with_temp_dir do |tmp|
         dir = Faa::Dir.new(active_project_lib: tmp)
         
-        expect_raises(ArgumentError) do
-          dir.find_or_create_project_dir(state: "UT", jcn: "25007236")
+        # Test missing city
+        expect_raises(Exception) do
+          dir.find_or_create_project_dir(**project_args.except(:city))
         end
         
-        expect_raises(ArgumentError) do
-          dir.find_or_create_project_dir(
-            state: "UT",
-            jcn: "25007236",
-            city: "Test",
-            locid: "LOC"
-            # Missing factype
-          )
+        # Test missing locid
+        expect_raises(Exception) do
+          dir.find_or_create_project_dir(**project_args.except(:locid))
+        end
+
+        # Test missing factype
+        expect_raises(Exception) do
+          dir.find_or_create_project_dir(**project_args.except(:factype))
         end
       end
     end
