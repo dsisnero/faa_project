@@ -75,6 +75,16 @@ module Faa::Commands
     end
 
     def run(arguments : Cling::Arguments, options : Cling::Options) : Nil
+      # Check for required arguments first
+      missing = [] of String
+      missing << "jcn" unless arguments.has?("jcn")
+      missing << "state" unless arguments.has?("state")
+      
+      unless missing.empty?
+        error "Missing required arguments: #{missing.join(", ")}"
+        exit 1
+      end
+
       # Get required arguments
       jcn = arguments.get("jcn").to_s.strip
       state_input = arguments.get("state").to_s.strip

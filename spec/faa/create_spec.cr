@@ -31,24 +31,30 @@ describe Faa::Commands::Create do
   describe "argument validation" do
     it "requires jcn and state" do
       command = Faa::Commands::Create.new
-
-      expect_raises(Cling::MissingArguments, /jcn/) do
-        command.run(
-          Cling::Arguments.new({
-            "state" => Cling::Argument.new("ut")
-          }),
-          Cling::Options.new({} of String => Cling::Option)
-        )
+      
+      # Test missing jcn
+      output = capture_stderr do
+        exit_code = capture_exit_code do
+          command.run(
+            Cling::Arguments.new({"state" => Cling::Argument.new("ut")}),
+            Cling::Options.new({} of String => Cling::Option)
+          )
+        end
+        exit_code.should eq(1)
       end
+      output.should contain("Missing required arguments: jcn")
 
-      expect_raises(Cling::MissingArguments, /state/) do
-        command.run(
-          Cling::Arguments.new({
-            "jcn" => Cling::Argument.new("25007323")
-          }),
-          Cling::Options.new({} of String => Cling::Option)
-        )
+      # Test missing state
+      output = capture_stderr do
+        exit_code = capture_exit_code do
+          command.run(
+            Cling::Arguments.new({"jcn" => Cling::Argument.new("25007323")}),
+            Cling::Options.new({} of String => Cling::Option)
+          )
+        end
+        exit_code.should eq(1)
       end
+      output.should contain("Missing required arguments: state")
     end
   end
 end

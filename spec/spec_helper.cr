@@ -30,6 +30,26 @@ ensure
   original_config.try(&.save)
 end
 
+def capture_stderr
+  original_stderr = STDERR
+  stderr = IO::Memory.new
+  STDERR.reopen(stderr)
+  yield
+  stderr.to_s
+ensure
+  STDERR.reopen(original_stderr)
+end
+
+def capture_exit_code
+  exit_code = 0
+  begin
+    yield
+  rescue ex : SystemExit
+    exit_code = ex.status
+  end
+  exit_code
+end
+
 
 require "./faa/dir_spec"
 require "./faa/utils_spec"
