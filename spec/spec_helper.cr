@@ -20,7 +20,7 @@ end
 def with_test_config(&)
   original_config = Faa::Config.load
   test_config = Faa::Config.new
-  test_config.working_project_directory_path = Dir.tempdir
+  test_config.working_project_directory = Dir.tempdir
 
   Faa::Config.stub(:load, test_config) do
     yield test_config
