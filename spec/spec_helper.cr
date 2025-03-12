@@ -53,7 +53,7 @@ def capture_exit_code
   exit_code = 0
   begin
     yield
-  rescue ex : SystemExit
+  rescue ex : Crystal::SystemExit
     exit_code = ex.status
   end
   exit_code
