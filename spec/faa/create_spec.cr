@@ -15,7 +15,7 @@ describe Faa::Commands::Create do
               "factype" => Cling::Argument.new("Test"),
               "title" => Cling::Argument.new("RTIR SITE PREP")
             }),
-            Cling::Options.new
+            Cling::Options.new({} of String => Cling::Option)
           )
 
           expected = File.join(
@@ -37,7 +37,7 @@ describe Faa::Commands::Create do
           Cling::Arguments.new({
             "state" => Cling::Argument.new("ut")
           }),
-          Cling::Options.new
+          Cling::Options.new({} of String => Cling::Option)
         )
       end
 
@@ -46,7 +46,7 @@ describe Faa::Commands::Create do
           Cling::Arguments.new({
             "jcn" => Cling::Argument.new("25007323")
           }),
-          Cling::Options.new
+          Cling::Options.new({} of String => Cling::Option)
         )
       end
     end
