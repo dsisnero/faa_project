@@ -20,8 +20,8 @@ module Faa
 
   # TODO: Put your code here
   Logging.setup_logging(
-    log_level: Log::Severity::Info,
-    file_path: File.join(__DIR__, "..", "logs", "faa_project.log"),
+    log_level: :info,
+    file_path: Path[__DIR__].parent /  "logs/faa_project.log",
     log_to_stderr: true
   )
 
