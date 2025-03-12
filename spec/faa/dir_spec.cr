@@ -9,6 +9,17 @@ describe Faa::Dir do
     original_config.save
   end
 
+  private def project_args(**overrides)
+    {
+      state: "UT",
+      jcn: "25007236",
+      city: "TestCity",
+      locid: "LOC123",
+      factype: "TestFacility",
+      title: ""
+    }.merge(overrides)
+  end
+
   describe "#initialize" do
     it "uses config defaults when no arguments given" do
       dir = Faa::Dir.new
@@ -28,15 +39,15 @@ describe Faa::Dir do
   describe "#find_or_create_project_dir" do
     it "finds existing project directory" do
       with_temp_dir do |tmp|
-        # Create test structure
+        # Create test structure using the same args as our helper
         state_dir = File.join(tmp, "UT")
-        jcn_dir = File.join(state_dir, "UT-25007236")
-        Dir.mkdir_p(jcn_dir)
+        project_dir = File.join(state_dir, "LOC123 (TestCity)")  # Matches default args
+        Dir.mkdir_p(project_dir)
 
-        # Test lookup
+        # Test lookup with full arguments
         dir = Faa::Dir.new(active_project_lib: tmp)
-        result = dir.find_or_create_project_dir(state: "UT", jcn: "25007236")
-        result.path.to_s.should contain("UT-25007236")
+        result = dir.find_or_create_project_dir(**project_args)
+        result.path.to_s.should contain("LOC123 (TestCity)")
       end
     end
 
@@ -44,15 +55,36 @@ describe Faa::Dir do
       with_temp_dir do |tmp|
         dir = Faa::Dir.new(active_project_lib: tmp)
         result = dir.find_or_create_project_dir(
-          state: "UT",
-          jcn: "25007236",
-          city: "Ogden",
-          locid: "OGD"
+          **project_args(
+            city: "Ogden",
+            locid: "OGD",
+            factype: "Airport" # Adding missing required argument
+          )
         )
 
         expected_path = File.join(tmp, "UT", "OGD (Ogden)")
         Dir.exists?(expected_path).should be_true
         result.path.should eq(Path.new(expected_path))
+      end
+    end
+
+    it "requires all mandatory arguments" do
+      with_temp_dir do |tmp|
+        dir = Faa::Dir.new(active_project_lib: tmp)
+        
+        expect_raises(ArgumentError) do
+          dir.find_or_create_project_dir(state: "UT", jcn: "25007236")
+        end
+        
+        expect_raises(ArgumentError) do
+          dir.find_or_create_project_dir(
+            state: "UT",
+            jcn: "25007236",
+            city: "Test",
+            locid: "LOC"
+            # Missing factype
+          )
+        end
       end
     end
   end
