@@ -1,6 +1,6 @@
 module Faa::Commands
   class Create < Base
-    class_property prompt : Faa::Commands::Prompt = Faa::Commands::Prompt.new
+    class_property prompt : Faa::Prompt = Faa::Prompt.new
     STATE_MAPPINGS = {
       "al" => "Alabama",
       "ak" => "Alaska",
