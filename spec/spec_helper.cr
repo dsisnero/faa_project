@@ -1,5 +1,6 @@
 require "spec"
 require "../src/faa/config"
+require "./support/mock_prompt"
 
 def with_temp_dir(path : String? = nil, &)
   path = File.join(Dir.tempdir, "#{path}#{Random.rand(0x100000000).to_s(36)}")

@@ -1,5 +1,6 @@
 module Faa::Commands
   class Create < Base
+    class_property prompt : Prompt = Prompt.new
     STATE_MAPPINGS = {
       "al" => "Alabama",
       "ak" => "Alaska",
@@ -80,10 +81,10 @@ module Faa::Commands
       state = convert_state(state_input)
 
       # Get optional arguments with prompts
-      city = arguments.get?("city").try(&.to_s.strip) || prompt.ask("Enter city name:", required: true).not_nil!.gsub(' ', '_')
-      locid = arguments.get?("locid").try(&.to_s.strip) || prompt.ask("Enter location ID:", required: true).not_nil!
-      factype = arguments.get?("factype").try(&.to_s.strip) || prompt.ask("Enter facility type:", required: true).not_nil!
-      title = arguments.get?("title").try(&.to_s.strip) || prompt.ask("Enter optional title")
+      city = arguments.get?("city").try(&.to_s.strip) || self.class.prompt.ask("Enter city name:", required: true).not_nil!.gsub(' ', '_')
+      locid = arguments.get?("locid").try(&.to_s.strip) || self.class.prompt.ask("Enter location ID:", required: true).not_nil!
+      factype = arguments.get?("factype").try(&.to_s.strip) || self.class.prompt.ask("Enter facility type:", required: true).not_nil!
+      title = arguments.get?("title").try(&.to_s.strip) || self.class.prompt.ask("Enter optional title")
 
       title = title.to_s if title
 
