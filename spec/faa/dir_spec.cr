@@ -1,15 +1,6 @@
 require "../spec_helper"
 require "../../src/faa/dir"
-
-describe Faa::Dir do
-  around_each do |test|
-    # Preserve original config state
-    original_config = Faa::Config.load
-    test.run
-    original_config.save
-  end
-
-  private def project_args(**overrides)
+  def project_args(**overrides)
     {
       state: "UT",
       jcn: "25007236",
@@ -19,6 +10,15 @@ describe Faa::Dir do
       title: ""
     }.merge(overrides)
   end
+
+describe Faa::Dir do
+  around_each do |test|
+    # Preserve original config state
+    original_config = Faa::Config.load
+    test.run
+    original_config.save
+  end
+
 
   describe "#initialize" do
     it "uses config defaults when no arguments given" do
