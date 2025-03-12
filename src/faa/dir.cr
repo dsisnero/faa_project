@@ -10,6 +10,13 @@ module Faa
   VERSION = "0.1.0"
 
   LOG_DIR = File.join(__DIR__, "..", "logs")
+  
+  # Extension to String for blank checking
+  private struct String
+    def blank?
+      empty? || matches?(/^\s*$/)
+    end
+  end
 
   # TODO: Put your code here
   Logging.setup_logging(
@@ -35,6 +42,10 @@ module Faa
     getter(fast_find_config) { FastFind::Config.new }
 
     property config : Config
+    
+    protected def error(msg : String) : Nil
+      STDERR << "» Error: " << msg << '\n'
+    end
 
     def initialize(
       @config = Config.load,
@@ -73,6 +84,17 @@ module Faa
     # end
 
     def find_or_create_project_dir(state : String, jcn : String, city : String, locid : String, factype : String, title : String)
+      # Add validation checks
+      missing = [] of String
+      missing << "city" if city.blank?
+      missing << "locid" if locid.blank?
+      missing << "factype" if factype.blank?
+      
+      unless missing.empty?
+        error "Missing required parameters: #{missing.join(", ")}"
+        exit 1
+      end
+
       state_path = active_project_lib / state.capitalize
       path = find_dir_or_file(base: state_path) do |entry|
         entry.path.to_s.downcase.includes?(jcn.downcase)
