@@ -1,4 +1,4 @@
-class MockPrompt
+class MockPrompt < Faa::Commands::Prompt
   property answers : Hash(String, String)
   property asked = [] of String
 
