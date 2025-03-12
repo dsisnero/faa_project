@@ -20,7 +20,7 @@ end
 def with_test_config
   original_config = Faa::Config.load
   test_config = Faa::Config.new
-  test_config.working_directory = Dir.tempdir
+  test_config.working_project_directory = Dir.tempdir
   test_config.active_project_library = Dir.tempdir
   
   yield test_config
