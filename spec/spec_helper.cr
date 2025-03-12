@@ -25,7 +25,7 @@ def with_test_config
   
   yield test_config
 ensure
-  original_config.save
+  original_config.try(&.save)
 end
 
 
