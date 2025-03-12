@@ -73,7 +73,7 @@ module Faa
     # end
 
     def find_or_create_project_dir(state : String, jcn : String, city : String, locid : String, factype : String, title : String)
-      state_path = active_project_lib / state
+      state_path = active_project_lib / state.capitalize
       path = find_dir_or_file(base: state_path) do |entry|
         entry.path.to_s.downcase.includes?(jcn.downcase)
       end
@@ -86,14 +86,14 @@ module Faa
     end
 
     def city_locid_dirname(city : String, locid : String)
-      "#{locid} (#{city.upcase})"
+      "#{locid.upcase} (#{city.capitalize})"
     end
 
     def project_dir_name(locid, factype, jcn, title : String? = nil)
       String.build do |s|
-        s << "#{locid} #{factype} - "
-        s << "#{title} - " if title
-        s << jcn
+        s << "#{locid.upcase} #{factype.upcase} - "
+        s << "#{title.not_nil!.upcase} - " if title
+        s << jcn.upcase
       end
     end
 
