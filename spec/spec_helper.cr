@@ -17,28 +17,17 @@ ensure
 end
 
 # Mock the Faa::Config.load to use test directory
-def with_test_config(&)
+def with_test_config
   original_config = Faa::Config.load
   test_config = Faa::Config.new
-  test_config.working_project_directory = Dir.tempdir
-
-  Faa::Config.stub(:load, test_config) do
-    yield test_config
-  end
+  test_config.working_project_directory = Path[Dir.tempdir]
+  test_config.active_project_library_path = Path[Dir.tempdir]
+  
+  yield test_config
+ensure
+  original_config.save
 end
 
-# Mock user input prompts for city/locid/factype
-def with_mocked_prompts(city = "TestCity", locid = "TLOC", factype = "TEST", &)
-  Faa::Commands::Create.any_instance.stub(:prompt) do |msg|
-    case msg
-    when /city/i     then city
-    when /locid/i    then locid
-    when /facility/i then factype
-    else                  ""
-    end
-  end
-  yield
-end
 
 require "./faa/dir_spec"
 require "./faa/utils_spec"

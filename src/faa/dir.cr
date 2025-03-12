@@ -34,13 +34,15 @@ module Faa
 
     getter(fast_find_config) { FastFind::Config.new }
 
+    property config : Config
+
     def initialize(
+      @config = Config.load,
       active_project_lib : String | Path | Nil = nil,
       working_dir : String | Path | Nil = nil,
     )
-      config = Config.load
-      @active_project_lib = active_project_lib ? Path.new(active_project_lib.to_s) : config.active_project_library_path
-      @working_dir = working_dir ? Path.new(working_dir.to_s) : config.working_project_directory_path
+      @active_project_lib = active_project_lib ? Path.new(active_project_lib.to_s) : @config.active_project_library_path
+      @working_dir = working_dir ? Path.new(working_dir.to_s) : @config.working_project_directory_path
       FileUtils.mkdir_p LOG_DIR
     end
 

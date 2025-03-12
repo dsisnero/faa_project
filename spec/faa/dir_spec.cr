@@ -22,17 +22,21 @@ describe Faa::Dir do
 
   describe "#initialize" do
     it "uses config defaults when no arguments given" do
-      dir = Faa::Dir.new
-      expected_active = Faa::Config.load.active_project_library_path
-      dir.active_project_lib.should eq(expected_active)
+      with_test_config do |config|
+        dir = Faa::Dir.new(config: config)
+        dir.active_project_lib.should eq(config.active_project_library_path)
+      end
     end
 
     it "allows custom path overrides" do
-      custom_dir = Faa::Dir.new(
-        active_project_lib: "/test/active",
-        working_dir: "/test/work"
-      )
-      custom_dir.active_project_lib.should eq(Path["/test/active"])
+      with_test_config do |config|
+        custom_dir = Faa::Dir.new(
+          config: config,
+          active_project_lib: "/test/active",
+          working_dir: "/test/work"
+        )
+        custom_dir.active_project_lib.should eq(Path["/test/active"])
+      end
     end
   end
 
