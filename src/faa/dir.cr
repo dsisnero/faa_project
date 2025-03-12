@@ -91,9 +91,11 @@ module Faa
 
     def project_dir_name(locid, factype, jcn, title : String? = nil)
       String.build do |s|
-        s << "#{locid.upcase} #{factype.upcase} - "
-        s << "#{title.not_nil!.upcase} - " if title
-        s << jcn.upcase
+        s << "#{locid.upcase} #{factype.upcase}"
+        if title && !title.empty?
+          s << " - #{title.upcase}"
+        end
+        s << " - #{jcn.upcase}"
       end
     end
 
