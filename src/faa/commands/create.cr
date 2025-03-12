@@ -88,8 +88,14 @@ module Faa::Commands
       title = title.to_s if title
 
       faa_dir = Faa::Dir.new
-      project_dir = faa_dir.find_or_create_project_dir(state: state, jcn: jcn, city: city,
-        locid: locid, factype: factype, title: title)
+      project_dir = faa_dir.find_or_create_project_dir(
+        state: state, 
+        jcn: jcn, 
+        city: city,
+        locid: locid, 
+        factype: factype, 
+        title: title
+      )
 
       # Generate directory path
 
