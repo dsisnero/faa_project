@@ -72,34 +72,56 @@ module Faa
         end
       end
 
-      def debug(data : _) : Nil
-        return unless @debug
-        stdout << "(#) ".colorize.bold << data << '\n'
-      end
+ protected def puts : Nil
+      stdout.puts
+    end
 
-      def info(data : _) : Nil
-        stdout << "(i) ".colorize.blue << data << '\n'
-      end
+    protected def puts(msg : String) : Nil
+      stdout.puts msg
+    end
 
-      def warn(data : _) : Nil
-        stdout << "(!) ".colorize.yellow << data << '\n'
-      end
+    protected def info(msg : String) : Nil
+      stdout << "» " << msg << '\n'
+    end
 
-      def error(data : _) : Nil
-        stdout << "(!) ".colorize.red << data << '\n'
-      end
+    protected def success(msg : String) : Nil
+      stdout << "» Success".colorize.green << ": " << msg << '\n'
+    end
+
+    protected def warn(msg : String) : Nil
+      stdout << "» Warning".colorize.yellow << ": " << msg << '\n'
+    end
+
+    protected def warn(*args : String) : Nil
+      stdout << "» Warning".colorize.yellow << ": " << args[0] << '\n'
+      args[1..].each { |arg| stdout << "»  ".colorize.yellow << arg << '\n' }
+    end
+
+    protected def error(msg : String) : Nil
+      stderr << "» Error".colorize.red << ": " << msg << '\n'
+    end
+
+    protected def error(*args : String) : Nil
+      stderr << "» Error".colorize.red << ": " << args[0] << '\n'
+      args[1..].each { |arg| stderr << "»  ".colorize.red << arg << '\n' }
+    end
+
+    protected def fatal(*args : String) : NoReturn
+      error *args
+      exit_program
+    end
 
       def on_error(ex : Exception)
         case ex
         when Cling::CommandError
-          error ex
+          error ex.message
           error "See '#{"project_dir --help".colorize.blue}' for more information"
         when Faa::Error
-          error ex
+          error ex.message
           # TODO: "See 'project_dir help query' for more information"
         else
           error "Unexpected exception:"
-          error ex
+          error ex.message
           error "Please report this on the project_dir GitHub issues:"
           error "https://github.com/dsisnero/project_dir/issues"
         end
