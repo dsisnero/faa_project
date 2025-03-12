@@ -68,23 +68,23 @@ describe Faa::Dir do
       end
     end
 
-    it "requires all mandatory arguments" do
+    it "validates required arguments" do
       with_temp_dir do |tmp|
         dir = Faa::Dir.new(active_project_lib: tmp)
         
-        # Test missing city
-        expect_raises(Exception) do
-          dir.find_or_create_project_dir(**project_args.except(:city))
+        # Test empty city
+        expect_raises(Exception, /City.*required/) do
+          dir.find_or_create_project_dir(**project_args.merge(city: ""))
         end
         
-        # Test missing locid
-        expect_raises(Exception) do
-          dir.find_or_create_project_dir(**project_args.except(:locid))
+        # Test empty locid
+        expect_raises(Exception, /Locid.*required/) do
+          dir.find_or_create_project_dir(**project_args.merge(locid: ""))
         end
 
-        # Test missing factype
-        expect_raises(Exception) do
-          dir.find_or_create_project_dir(**project_args.except(:factype))
+        # Test empty factype
+        expect_raises(Exception, /Factype.*required/) do
+          dir.find_or_create_project_dir(**project_args.merge(factype: ""))
         end
       end
     end
