@@ -15,6 +15,9 @@ module Faa
     @[YAML::Field(type: ::String)]
     property working_project_directory : String? = nil
 
+    @[YAML::Field]
+    property log_level : Log::Severity = Log::Severity::Info
+    
     @[YAML::Field(type: ::String)]
     property log_file : String? = nil
 
@@ -44,11 +47,11 @@ module Faa
       Path.new(XDG::Cache.new("faa_project").to_s).join("logs")
     end
 
-    def log_file_path
+    def log_path
       if custom = @log_file
         Path.new(custom)
       else
-        default_log_dir.join("faa.log")
+        XDG::Cache.new("faa_project").to_path / "logs" / "faa.log"
       end
     end
 

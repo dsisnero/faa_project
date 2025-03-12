@@ -1,38 +1,27 @@
 require "log"
 require "./log_formatter"
+require "file_utils"
 
 module Faa
   module Logging
     def self.setup_logging(config : Faa::Config)
-      log_level = ::Log::Severity::Info
-      log_path = config.log_file_path
-      log_to_stderr = true
-
-      # Ensure log directory exists
+      # Get config values
+      log_level = config.log_level
+      log_path = config.log_path
+      
+      # Create directory if needed
       FileUtils.mkdir_p(log_path.dirname)
       
-      broadcast_backend = ::Log::BroadcastBackend.new
-      
-      # File backend
-      file_backend = ::Log::IOBackend.new(
-        io: File.open(log_path, "a"),
-        formatter: StdoutLogFormat,
-        dispatcher: ::Log::DirectDispatcher
-      )
-      broadcast_backend.append(file_backend, log_level)
-
-      # STDERR backend
-      if log_to_stderr
-        stderr_backend = ::Log::IOBackend.new(
-          io: STDERR,
-          formatter: StdoutLogFormat,
-          dispatcher: ::Log::DirectDispatcher
+      # Configure logging
+      ::Log.setup(
+        log_level,
+        backend: ::Log::IOBackend.new(
+          File.open(log_path, "a"),
+          formatter: StdoutLogFormat
         )
-        broadcast_backend.append(stderr_backend, log_level)
-      end
-
-      ::Log.setup(log_level, broadcast_backend)
-      ::Log.info &.emit("Logging initialized", path: log_path.to_s)
+      )
+      
+      ::Log.info { "Logging initialized".colorize.cyan }
     end
   end
 end

@@ -9,7 +9,6 @@ require "./config"
 module Faa
   VERSION = "0.1.0"
 
-  LOG_DIR = File.join(__DIR__, "..", "logs")
   
   # Extension to String for blank checking
   private struct String
@@ -18,12 +17,6 @@ module Faa
     end
   end
 
-  # TODO: Put your code here
-  Logging.setup_logging(
-    log_level: :info,
-    file_path: Path[__DIR__].parent /  "logs/faa_project.log",
-    log_to_stderr: true
-  )
 
   # dir = Faa::Dir.new
   # proj_dir = dir.find_or_create_project_dir(state: "Utah", jcn: "25007236")
@@ -52,9 +45,11 @@ module Faa
       active_project_lib : String | Path | Nil = nil,
       working_dir : String | Path | Nil = nil,
     )
+      # Initialize logging first
+      Faa::Logging.setup_logging(@config)
+      
       @active_project_lib = active_project_lib ? Path.new(active_project_lib.to_s) : @config.active_project_library_path
       @working_dir = working_dir ? Path.new(working_dir.to_s) : @config.working_project_directory_path
-      FileUtils.mkdir_p LOG_DIR
     end
 
     def directory_from_state_abbrv(abbrev : String)
