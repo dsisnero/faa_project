@@ -11,20 +11,22 @@ module Faa
 
       begin
         new(file, Serialisable.from_json(config_contents))
-      rescue ex
+      rescue ex : JSON::SerializableError | JSON::ParseException
         {% if flag?(:debug) %}
           raise(ex)
         {% else %}
-          reason = ex.message.try(&.split("\n").first) if ex.is_a?(JSON::SerializableError) || ex.is_a?(JSON::ParseException)
+          reason = "#{ex.class}: #{ex.message.try(&.split("\n").first)}"
           # TODO: Better handle this potential once-off case
           display.error("Invalid Config!", reason) do |sub_errors|
             sub_errors << "If you want to try and fix the config manually press Ctrl+C to quit\n"
             sub_errors << "Press enter if you want to proceed with a default config (this will override the existing config)"
           end
           gets # don't proceed unless user wants us to
-          nil
+          new(file)
         {% end %}
-      end || new(file)
+      rescue ex
+        raise ex
+      end
     end
 
     getter serialisable : Serialisable
