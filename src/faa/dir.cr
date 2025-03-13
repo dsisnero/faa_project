@@ -10,10 +10,15 @@ module Faa
   VERSION = "0.1.0"
 
   # Extension to String for blank checking
-  private struct String
+  private module StringExtension
     def blank?
       empty? || matches?(/^\s*$/)
     end
+  end
+
+  # Apply extension to core String class
+  class ::String
+    include StringExtension
   end
 
   # dir = Faa::Dir.new
@@ -71,7 +76,7 @@ module Faa
     #   result || not_found
     # end
 
-    def find_or_create_project_dir(state : ::String, jcn : ::String, city : ::String, locid : ::String, factype : ::String, title : ::String)
+    def find_or_create_project_dir(state : ::String, jcn : ::String, city : ::String, locid : ::String, factype : ::String, title : ::String?)
       # Add validation checks
       missing = [] of ::String
       missing << "city" if city.blank?

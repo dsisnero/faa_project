@@ -49,3 +49,8 @@ end
     config_file: Faa::Configuration::File.new
   )
 {% end %}
+module Faa
+  def self.exit(code = 0)
+    ::exit(code)
+  end
+end
