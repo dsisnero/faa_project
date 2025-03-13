@@ -9,14 +9,12 @@ require "./config"
 module Faa
   VERSION = "0.1.0"
 
-  
   # Extension to String for blank checking
   private struct String
     def blank?
       empty? || matches?(/^\s*$/)
     end
   end
-
 
   # dir = Faa::Dir.new
   # proj_dir = dir.find_or_create_project_dir(state: "Utah", jcn: "25007236")
@@ -28,26 +26,26 @@ module Faa
 
     # property jcn : String
 
-    getter active_project_lib : Path
+    getter active_project_lib : ::Path
 
-    getter working_dir : Path
+    getter working_dir : ::Path
 
     getter(fast_find_config) { FastFind::Config.new }
 
     property config : Config
-    
-    protected def error(msg : String) : Nil
+
+    protected def error(msg : ::String) : Nil
       STDERR << "» Error: " << msg << '\n'
     end
 
     def initialize(
       @config = Config.load,
-      active_project_lib : String | Path | Nil = nil,
-      working_dir : String | Path | Nil = nil,
+      active_project_lib : ::String | ::Path | Nil = nil,
+      working_dir : ::String | ::Path | Nil = nil,
     )
       # Initialize logging first
       Faa::Logging.setup_logging(@config)
-      
+
       @active_project_lib = active_project_lib ? Path.new(active_project_lib.to_s) : @config.active_project_library_path
       @working_dir = working_dir ? Path.new(working_dir.to_s) : @config.working_project_directory_path
     end
@@ -78,13 +76,13 @@ module Faa
     #   result || not_found
     # end
 
-    def find_or_create_project_dir(state : String, jcn : String, city : String, locid : String, factype : String, title : String)
+    def find_or_create_project_dir(state : ::String, jcn : ::String, city : ::String, locid : ::String, factype : ::String, title : ::String)
       # Add validation checks
-      missing = [] of String
+      missing = [] of ::String
       missing << "city" if city.blank?
       missing << "locid" if locid.blank?
       missing << "factype" if factype.blank?
-      
+
       unless missing.empty?
         error "Missing required parameters: #{missing.join(", ")}"
         exit 1
@@ -102,12 +100,12 @@ module Faa
       end
     end
 
-    def city_locid_dirname(city : String, locid : String)
+    def city_locid_dirname(city : ::String, locid : ::String)
       "#{locid.upcase} (#{city.capitalize})"
     end
 
-    def project_dir_name(locid, factype, jcn, title : String? = nil)
-      String.build do |s|
+    def project_dir_name(locid, factype, jcn, title : ::String? = nil)
+      ::String.build do |s|
         s << "#{locid.upcase} #{factype.upcase}"
         if title && !title.empty?
           s << " - #{title.upcase}"
@@ -116,7 +114,7 @@ module Faa
       end
     end
 
-    def create_project_dir(state_path : Path, city : String, locid : String, jcn : String, factype : String, title : String? = nil)
+    def create_project_dir(state_path : ::Path, city : ::String, locid : ::String, jcn : ::String, factype : ::String, title : ::String? = nil)
       locid_city_path = state_path / city_locid_dirname(city, locid)
       project_path = locid_city_path / project_dir_name(locid, factype, jcn, title)
 
@@ -124,7 +122,7 @@ module Faa
       ProjectDir.new(project_path)
     end
 
-    def lid_dir_name(lid : String, city : String)
+    def lid_dir_name(lid : ::String, city : ::String)
       "#{lid.upcase} (#{city})"
     end
 

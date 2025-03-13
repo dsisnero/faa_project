@@ -76,10 +76,10 @@ module Faa::Commands
 
     def run(arguments : Cling::Arguments, options : Cling::Options) : Nil
       # Check for required arguments first
-      missing = [] of String
+      missing = [] of ::String
       missing << "jcn" unless arguments.has?("jcn")
       missing << "state" unless arguments.has?("state")
-      
+
       unless missing.empty?
         error "Missing required arguments: #{missing.join(", ")}"
         exit 1
@@ -100,11 +100,11 @@ module Faa::Commands
 
       faa_dir = Faa::Dir.new
       project_dir = faa_dir.find_or_create_project_dir(
-        state: state, 
-        jcn: jcn, 
+        state: state,
+        jcn: jcn,
         city: city,
-        locid: locid, 
-        factype: factype, 
+        locid: locid,
+        factype: factype,
         title: title
       )
 
@@ -116,7 +116,7 @@ module Faa::Commands
       exit 1
     end
 
-    private def convert_state(input : String) : String
+    private def convert_state(input : ::String) : ::String
       # Try abbreviation first (case-insensitive)
       if input.size == 2
         if full_name = STATE_MAPPINGS[input.downcase]?
