@@ -125,7 +125,7 @@ describe Faa::Configuration do
 
   describe "error handling" do
     it "shows proper error for missing required fields" do
-      invalid_config = {log_file: "/custom.log"}.to_json
+      invalid_config = {}.to_json
       File.write(Faa::Configuration::File::CONFIG_PATH, invalid_config)
 
       io = IO::Memory.new
