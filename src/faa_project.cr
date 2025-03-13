@@ -7,8 +7,6 @@ end
 require "./faa/dir"
 require "./faa/utils"
 require "./faa/app"
-begin
-  Faa::App.new.execute(ARGV)
-rescue
-  exit 1
-end
+
+# Main entry point for the application
+Faa::App.run
