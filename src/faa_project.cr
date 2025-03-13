@@ -19,15 +19,21 @@ module Faa
   private def build_context(stdin : IO, stdout : IO, config_file : Configuration::AbstractFile) : Context
     display = Display.new(stdout)
     input = Input.new(stdin, display)
-    begin
-    config = Configuration.init(config_file, display)
-    rescue
-      display.error("problem reading #{config_file}")
-      display.error("erasing contents")
-      config_file.write("")
-      display.error("run 'faa_project config edit'")
-      Faa.exit!
+    
+    # Ensure config file exists before initializing
+    if config_file.is_a?(Configuration::File) && !config_file.read
+      config_file.write(Configuration::Serialisable.new.to_json)
     end
+    
+    begin
+      config = Configuration.init(config_file, display)
+    rescue ex
+      display.error("Problem reading configuration: #{ex.message}")
+      display.error("Creating default configuration")
+      config_file.write(Configuration::Serialisable.new.to_json)
+      config = Configuration.init(config_file, display)
+    end
+    
     faa_dir = faa_dir_from_config(config)
 
     Context.new(

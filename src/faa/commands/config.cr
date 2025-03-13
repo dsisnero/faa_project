@@ -29,7 +29,15 @@ module Faa::Commands
       end
 
       private def edit_with_external_editor
-        config_path = Faa::Configuration::File::CONFIG_PATH
+        config_file = Faa::Configuration::File.new
+        config_path = config_file.CONFIG_PATH.to_s
+        
+        # Create file if missing
+        unless File.exists?(config_path)
+          FileUtils.mkdir_p(File.dirname(config_path))
+          config_file.write(Faa::Configuration::Serialisable.new.to_json)
+        end
+        
         editor = ENV["EDITOR"]? || "nano" # Default to nano if $EDITOR not set
 
         puts "Opening config file: #{config_path}"
