@@ -33,8 +33,8 @@ module Faa::Commands
         config_path = config_file.CONFIG_PATH.to_s
         
         # Create file if missing
-        unless File.exists?(config_path)
-          FileUtils.mkdir_p(File.dirname(config_path))
+        unless ::File.exists?(config_path)
+          FileUtils.mkdir_p(::File.dirname(config_path))
           config_file.write(Faa::Configuration::Serialisable.new.to_json)
         end
         

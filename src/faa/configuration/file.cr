@@ -7,13 +7,13 @@ module Faa
       CONFIG_PATH = CONFIG_DIR / "config.json"
 
       def read : ::String?
-        return unless CONFIG_PATH.exists?
-        CONFIG_PATH.read
+        return unless ::File.exists?(CONFIG_PATH)
+        ::File.read(CONFIG_PATH)
       end
 
       def write(content : ::String)
-        FileUtils.mkdir_p(CONFIG_DIR) unless CONFIG_DIR.exists?
-        CONFIG_PATH.write(content)
+        FileUtils.mkdir_p(CONFIG_DIR) unless Dir.exists?(CONFIG_DIR)
+        ::File.write(CONFIG_PATH, content)
       end
 
       def close
