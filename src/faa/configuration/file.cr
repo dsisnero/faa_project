@@ -3,7 +3,7 @@ require "./abstract_file"
 module Faa
   class Configuration
     class File < Configuration::AbstractFile
-      CONFIG_DIR  = Path[XDG.config_home] / "faa_project"
+      CONFIG_DIR  = XDG.app_config("faa_project")
       CONFIG_PATH = CONFIG_DIR / "config.json"
 
       def read : ::String?
