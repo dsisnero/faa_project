@@ -41,7 +41,7 @@ module Faa::Commands
       end
 
       def run_(arguments : Cling::Arguments, options : Cling::Options) : Nil
-        config = Faa::Config.load
+        config = context.config
         puts <<-CONFIG
            Active Project Library: #{config.active_project_library_path}
            Working Directory: #{config.working_project_dir_path}

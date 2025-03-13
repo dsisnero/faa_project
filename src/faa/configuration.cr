@@ -28,7 +28,7 @@ module Faa
     end
 
     getter serialisable : Serialisable
-    
+
     def initialize(@file : Configuration::AbstractFile, @serialisable = Serialisable.new); end
 
     delegate :active_project_library,

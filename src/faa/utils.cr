@@ -1,7 +1,6 @@
 require "compress/zip"
 
 module Faa
-
   module Utils
     extend self
 

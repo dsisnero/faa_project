@@ -1,5 +1,5 @@
-require "../config"
-require "./base"
+# require "../config"
+# require "./base"
 
 module Faa::Commands
   class Create < Base

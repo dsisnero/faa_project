@@ -1,5 +1,6 @@
 require "./project_dir"
 require "baked_file_system"
+require "xdg"
 require "log"
 
 Log.setup_from_env

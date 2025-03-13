@@ -13,33 +13,14 @@ def project_args(**overrides)
 end
 
 describe Faa::Dir do
-  around_each do |test|
-    # Preserve original config state
-    original_config = Faa::Config.load
-    test.run
-    original_config.save
-  end
-
   describe "#initialize" do
-    it "uses config defaults when no arguments given" do
-      with_test_config do |config|
-        dir = Faa::Dir.new(
-          active_project_lib: config.active_project_library_path,
-          working_dir: config.working_project_directory_path
-        )
-        dir.active_project_lib.should eq(config.active_project_library_path)
-      end
-    end
-
-    it "allows custom path overrides" do
-      with_test_config do |_|
-        custom_dir = Faa::Dir.new(
-          active_project_lib: Path["/test/active"],
-          working_dir: Path["/test/work"]
-        )
-        custom_dir.active_project_lib.should eq(Path["/test/active"])
-      end
-    end
+        active_lib = "testlib"
+        working_lib = "workinglib"
+        
+        dir = Faa::Dir.new(active_project_lib: active_lib,
+                    working_dir: working_lib)
+        dir.active_project_lib.to_s.should eq(active_lib)
+        dir.working_dir.to_s.should eq(working_lib)
   end
 
   describe "#find_or_create_project_dir" do

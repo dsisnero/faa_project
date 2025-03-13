@@ -2,14 +2,14 @@ require "../spec_helper"
 
 describe Faa::Configuration do
   it "initializes with provided config values" do
-    with_config({
+    with_config_file({
       active_project_library: "/test/active",
-      working_project_dir: "/test/workdir",
-      log_file: "/test/log.log"
+      working_project_dir:    "/test/workdir",
+      log_file:               "/test/log.log",
     }) do |test_file|
       display = Faa::Display.new(IO::Memory.new)
       config = Faa::Configuration.init(test_file, display)
-      
+
       config.active_project_library_path.should eq(Path["/test/active"])
       config.working_project_dir_path.should eq(Path["/test/workdir"])
       config.log_file_path.should eq(Path["/test/log.log"])
@@ -26,7 +26,7 @@ describe Faa::Configuration do
     it "initializes with default values when no config exists" do
       io = IO::Memory.new
       display = Faa::Display.new(io)
-      
+
       config = Faa::Configuration.init(Faa::Configuration::File.new, display)
       config.active_project_library_path.should eq(config.serialisable.default_active_path)
       io.to_s.should be_empty
@@ -35,8 +35,8 @@ describe Faa::Configuration do
     it "loads valid configuration from existing file" do
       valid_config = {
         active_project_library: "/custom/active",
-        working_project_dir: "/custom/work",
-        log_file: "/custom/log.log"
+        working_project_dir:    "/custom/work",
+        log_file:               "/custom/log.log",
       }.to_json
       File.write(Faa::Configuration::File::CONFIG_PATH, valid_config)
 
@@ -55,7 +55,7 @@ describe Faa::Configuration do
 
       io = IO::Memory.new
       display = Faa::Display.new(io)
-      
+
       # Simulate user pressing enter to accept defaults
       stdin = IO::Memory.new("\n")
       config = Faa::Configuration.init(Faa::Configuration::File.new, display)
@@ -64,14 +64,14 @@ describe Faa::Configuration do
       io.to_s.should contain("Invalid Config!")
       io.to_s.should contain("JSON::ParseException")
       io.to_s.should contain("Press enter if you want to proceed with a default config")
-      
+
       # Verify fallback to default config
       config.active_project_library_path.should eq(config.serialisable.default_active_path)
     end
 
     it "handles empty config file as defaults" do
       File.touch(Faa::Configuration::File::CONFIG_PATH)
-      
+
       io = IO::Memory.new
       display = Faa::Display.new(io)
       config = Faa::Configuration.init(Faa::Configuration::File.new, display)
@@ -86,10 +86,10 @@ describe Faa::Configuration do
       io = IO::Memory.new
       display = Faa::Display.new(io)
       config = Faa::Configuration.init(Faa::Configuration::File.new, display)
-      
+
       new_active = Path["/new/active/path"]
       new_work = Path["/new/work/path"]
-      
+
       config.overwrite!(new_active.to_s, new_work.to_s)
       config.save!
 
@@ -104,7 +104,7 @@ describe Faa::Configuration do
   describe "Serialisable" do
     it "provides expected default paths" do
       serialisable = Faa::Configuration::Serialisable.new
-      
+
       serialisable.default_active_path.to_s.should contain("Active Project Library")
       serialisable.default_working_path.to_s.should contain("faa_workspace")
       serialisable.default_log_file_path.to_s.should contain("faa.log")
@@ -113,10 +113,10 @@ describe Faa::Configuration do
     it "uses configured paths when available" do
       serialisable = Faa::Configuration::Serialisable.from_json({
         active_project_library: "/custom/active",
-        working_project_dir: "/custom/work",
-        log_file: "/custom/log.log"
+        working_project_dir:    "/custom/work",
+        log_file:               "/custom/log.log",
       }.to_json)
-      
+
       serialisable.active_project_library_path.should eq(Path["/custom/active"])
       serialisable.working_project_dir_path.should eq(Path["/custom/work"])
       serialisable.log_file_path.should eq(Path["/custom/log.log"])
@@ -125,12 +125,12 @@ describe Faa::Configuration do
 
   describe "error handling" do
     it "shows proper error for missing required fields" do
-      invalid_config = { log_file: "/custom.log" }.to_json
+      invalid_config = {log_file: "/custom.log"}.to_json
       File.write(Faa::Configuration::File::CONFIG_PATH, invalid_config)
 
       io = IO::Memory.new
       display = Faa::Display.new(io)
-      
+
       # Simulate user accepting defaults
       stdin = IO::Memory.new("\n")
       config = Faa::Configuration.init(Faa::Configuration::File.new, display)

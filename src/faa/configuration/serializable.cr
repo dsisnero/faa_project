@@ -9,13 +9,12 @@ module Faa
         @log_file = default_log_file_path.to_s
       end
 
-      property active_project_library : ::String?
-      property working_project_dir : ::String?
+      property active_project_library : String?
+      property working_project_dir : String?
+      property log_file : String
 
-      @[JSON::Field(emit_null: true)]
-      property log_file : ::String?
 
-      # Add helper method to get concrete paths
+      # Add helper method to ge concrete paths
       def active_project_library_path
         Path.new(@active_project_library || default_active_path.to_s)
       end

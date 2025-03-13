@@ -22,14 +22,14 @@ module Configuration
 end
 
 def with_config(config, &)
-  with_config_file(config) do |_|
+  with_config_file(config) do |test_file|
     display = Faa::Display.new(IO::Memory.new)
     config = Faa::Configuration.init(test_file, display)
     yield config
   end
 end
 
-def with_config_file(config : Hash, &)
+def with_config_file(config, &)
   test_file = Configuration::TestConfig.new(config.to_json)
   yield test_file
 end
@@ -48,16 +48,25 @@ def with_temp_env(key, value, &)
 ensure
   ENV[key] = original
 end
+ # spec/spec_helper.cr
+ def run_with_config(
+   args : Array(String),
+   stdin : IO = IO::Memory.new,
+   config_fixture : Configuration::TestConfig = Configuration::TestConfig.new
+ ) : Faa::Context
+   Faa.main(
+     args,
+     stdout: IO::Memory.new,
+     stdin: stdin,
+     config_file: config_fixture
+   )
+ end
 
-def run(args : Array(String), input : String = "") : Faa::Context
-  stdout = IO::Memory.new
-  stdin = IO::Memory.new(input)
-  config_file = Configuration::TestConfig.new
-
+def run(args : Array(String), stdin : IO = IO::Memory.new, config_fixture : Configuration::FixtureFile::Fixture = :default) : Faa::Context
   Faa.main(
-    args: args,
-    stdout: stdout,
+    args,
+    stdout: IO::Memory.new,
     stdin: stdin,
-    config_file: config_file
+    config_file: Configuration::FixtureFile.load(config_fixture)
   )
 end
