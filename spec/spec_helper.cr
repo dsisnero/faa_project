@@ -1,6 +1,7 @@
 require "spec"
 require "../src/faa/config"
 require "../src/faa/prompt"
+require "../src/faa/utils"
 require "./support/mock_prompt"
 
 def with_temp_dir(path : String? = nil, &)
