@@ -84,7 +84,7 @@ module Faa::Commands
         @name = "edit"
         @description = "Edit configuration file interactively or with external editor"
         
-        add_option "e", "editor", description: "Open in external editor instead of interactive mode"
+        add_option 'e', "editor", description: "Open in external editor instead of interactive mode"
       end
     end
 
