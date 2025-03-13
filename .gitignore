@@ -6,3 +6,4 @@ lib/
 .aider*
 src/logs/faa_project.log
 d:/tmp/completion.log
+.envrc

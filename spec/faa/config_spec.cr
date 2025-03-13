@@ -47,14 +47,14 @@ describe Faa::Config do
       it "returns default log path when not configured" do
         config = Faa::Config.new
         config.log_file = nil
-        
-        config.log_file_path.should eq(config.default_log_dir.join("faa.log"))
+
+        config.log_file_path.should eq(config.default_log_file_path)
       end
 
       it "returns custom log path when configured" do
         config = Faa::Config.new
         config.log_file = "/custom/path/to/log.txt"
-        
+
         config.log_file_path.should eq(Path["/custom/path/to/log.txt"])
       end
     end

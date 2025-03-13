@@ -1,0 +1,48 @@
+require "json"
+require "file_utils"
+
+require "./configuration/**"
+
+module Faa
+  class Configuration
+    def self.init(file : Configuration::AbstractFile, display : Display) : Configuration
+      config_contents = file.read.presence
+      return new(file) unless config_contents
+
+      begin
+        new(file, Serialisable.from_json(config_contents))
+      rescue ex
+        {% if flag?(:debug) %}
+          raise(ex)
+        {% else %}
+          reason = ex.message.try(&.split("\n").first) if ex.is_a?(JSON::SerializableError) || ex.is_a?(JSON::ParseException)
+          # TODO: Better handle this potential once-off case
+          display.error("Invalid Config!", reason) do |sub_errors|
+            sub_errors << "If you want to try and fix the config manually press Ctrl+C to quit\n"
+            sub_errors << "Press enter if you want to proceed with a default config (this will override the existing config)"
+          end
+          gets # don't proceed unless user wants us to
+          nil
+        {% end %}
+      end || new(file)
+    end
+
+    def initialize(@file : Configuration::AbstractFile, @serialisable = Serialisable.new); end
+
+    delegate :active_project_library,
+      :active_project_library_path,
+      :working_project_directory,
+      :working_project_directory_path,
+      to: @serialisable
+
+    def overwrite!(active_project_library : String, working_project_directory : String)
+      self.active_project_library = active_project_library
+      access_token.working_project_directory = working_project_directory
+      save!
+    end
+
+    def save!
+      @file.write(@serialisable.to_json)
+    end
+  end
+end

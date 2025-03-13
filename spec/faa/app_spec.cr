@@ -1,6 +1,6 @@
 require "../spec_helper"
 
-describe Faa::CLI do
+describe Faa::App do
   describe "config" do
     describe "show" do
       it "displays current configuration values" do

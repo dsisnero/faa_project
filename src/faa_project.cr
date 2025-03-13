@@ -1,7 +1,6 @@
 require "json"
 require "./faa/**"
 
-
 module Faa
   extend self
 
@@ -13,26 +12,27 @@ module Faa
     config_file.close
   end
 
-  def exit! : NoReturn
-    raise(Cling::ExitProgram.new(0))
+  def exit!(status = 0) : NoReturn
+    ::exit status
   end
 
   private def build_context(stdin : IO, stdout : IO, config_file : Configuration::AbstractFile) : Context
     display = Display.new(stdout)
     input = Input.new(stdin, display)
     config = Configuration.init(config_file, display)
-    project_dir = project_dir_from_config(config)
+    config.save!
+    faa_dir = faa_dir_from_config(config).not_nil!
 
     Context.new(
       stdout,
       config,
       display,
       input,
-      project_dir
+      faa_dir.not_nil!
     )
   end
 
-  private def project_dir_from_config(config : Configuration) : Dir
+  private def faa_dir_from_config(config : Configuration) : Dir
     Dir.new(config.active_project_library_path, config.working_project_directory_path)
   end
 end

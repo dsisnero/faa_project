@@ -9,18 +9,6 @@ require "./config"
 module Faa
   VERSION = "0.1.0"
 
-  # Extension to String for blank checking
-  private module StringExtension
-    def blank?
-      empty? || matches?(/^\s*$/)
-    end
-  end
-
-  # Apply extension to core String class
-  class ::String
-    include StringExtension
-  end
-
   # dir = Faa::Dir.new
   # proj_dir = dir.find_or_create_project_dir(state: "Utah", jcn: "25007236")
   class Dir
@@ -42,12 +30,12 @@ module Faa
     end
 
     def initialize(
-      active_project_lib : ::Path,
-      working_dir : ::Path,
+      active_project_lib : Path | String,
+      working_dir : Path | String,
       @fast_find_config : FastFind::Config = FastFind::Config.new,
     )
-      @active_project_lib = active_project_lib
-      @working_dir = working_dir
+      @active_project_lib = Path.new active_project_lib
+      @working_dir = Path.new working_dir
     end
 
     def directory_from_state_abbrv(abbrev : String)

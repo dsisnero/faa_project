@@ -1,8 +1,8 @@
 require "../config"
+require "./base"
 
 module Faa::Commands
   class Create < Base
-    class_property prompt : Faa::Prompt = Faa::Prompt.new
     STATE_MAPPINGS = {
       "al" => "Alabama",
       "ak" => "Alaska",
@@ -62,7 +62,7 @@ module Faa::Commands
       "mp" => "Northern Mariana Islands",
     }
 
-    def setup : Nil
+    def setup_ : Nil
       @name = "create"
       @summary = "Create new project directory"
       @description = "Generate FAA-compliant project directory structure"
@@ -76,15 +76,15 @@ module Faa::Commands
       add_argument "title", description: "Optional title to include in dirname"
     end
 
-    def run(arguments : Cling::Arguments, options : Cling::Options) : Nil
+    def run_(arguments : Cling::Arguments, options : Cling::Options) : Nil
       # Check for required arguments first
       missing = [] of ::String
       missing << "jcn" unless arguments.has?("jcn")
       missing << "state" unless arguments.has?("state")
 
       unless missing.empty?
-        error "Missing required arguments: #{missing.join(", ")}"
-        exit 1
+        display.error "Missing required arguments: #{missing.join(", ")}"
+        Faa.exit!
       end
 
       # Get required arguments
@@ -93,19 +93,23 @@ module Faa::Commands
       state = convert_state(state_input)
 
       # Get optional arguments with prompts
-      city = arguments.get?("city").try(&.to_s.strip) || self.class.prompt.ask("Enter city name:", required: true).not_nil!.gsub(' ', '_')
-      locid = arguments.get?("locid").try(&.to_s.strip) || self.class.prompt.ask("Enter location ID:", required: true).not_nil!
-      factype = arguments.get?("factype").try(&.to_s.strip) || self.class.prompt.ask("Enter facility type:", required: true).not_nil!
-      title = arguments.get?("title").try(&.to_s.strip) || self.class.prompt.ask("Enter optional title")
+      city = arguments.get?("city").try(&.to_s.strip) || input.request_or("Enter city name:") do
+        display.puts("You must enter a city")
+        input.request("Enter city: ")
+      end.not_nil!.gsub(' ', '_')
+      locid = arguments.get?("locid").try(&.to_s.strip) || input.request_or("Enter location ID:") do
+        display.puts("LOCID is required")
+        input.request("Enter LOCID:")
+      end.not_nil!
+      factype = arguments.get?("factype").try(&.to_s.strip) || input.request_or("Enter facility type:") do
+        display.puts("Facility is required")
+        input.request("Facility:")
+      end.not_nil!
+      title = arguments.get?("title").try(&.to_s.strip) || input.request("Enter optional title")
 
       title = title.to_s if title
 
-      config = Config.load
-      faa_dir = Faa::Dir.new(
-        active_project_lib: config.active_project_library_path,
-        working_dir: config.working_project_directory_path
-      )
-      project_dir = faa_dir.find_or_create_project_dir(
+      project_dir = context.faa_dir.find_or_create_project_dir(
         state: state,
         jcn: jcn,
         city: city,
@@ -116,10 +120,10 @@ module Faa::Commands
 
       # Generate directory path
 
-      info "Successfully created project directory: #{project_dir.path.colorize.green}"
+      display.success "Successfully created project directory: #{project_dir.path.colorize.green}"
     rescue ex : File::Error
-      error "Failed to create directory: #{ex.message}"
-      exit 1
+      display.error "Failed to create directory: #{ex.message}"
+      Faa.exit!
     end
 
     private def convert_state(input : ::String) : ::String
@@ -139,11 +143,12 @@ module Faa::Commands
       end
 
       # No matches found
-      error "Invalid state: #{input.colorize.red}"
-      error "Must be one of:"
-      error "  - 2-letter abbreviation (#{STATE_MAPPINGS.keys.join(", ")})"
-      error "  - Full state name (e.g. #{STATE_MAPPINGS.values.sample(3).join(", ")})"
-      exit 1
+      display.error "Invalid state:", input do |err|
+        err << "Must be one of:\n"
+        err << "  - 2-letter abbreviation (#{STATE_MAPPINGS.keys.join(", ")})\n"
+        err << "  - Full state name (e.g. #{STATE_MAPPINGS.values.sample(3).join(", ")})\n"
+      end
+      Faa.exit!
     end
   end
 end

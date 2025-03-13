@@ -1,27 +1,26 @@
 module Faa::Commands
   class Config < Base
-    def setup : Nil
+    def setup_ : Nil
       @name = "config"
       @summary = "Configuration cmd"
       @description = "Setup, and edit project_dir configuration"
 
-      add_command Commands::Config::Edit.new
-      add_command Commands::Config::Show.new
+      add_commands(Edit, Show)
     end
 
-    def run(arguments : Cling::Arguments, options : Cling::Options) : Nil
+    def run_(arguments : Cling::Arguments, options : Cling::Options) : Nil
       stdout.puts help_template
       exit 0
     end
 
     class Edit < Faa::Commands::Config
-      def setup : Nil
+      def setup_ : Nil
         @name = "edit"
         @description = "Edit configuration file in default editor"
       end
 
-      def run(arguments : Cling::Arguments, options : Cling::Options) : Nil
-        config_path = File.join(Faa::Config.dir, "config.yml")
+      def run_(arguments : Cling::Arguments, options : Cling::Options) : Nil
+        config_path = Faa::Configuration::File::CONFIG_PATH
         editor = ENV["EDITOR"]? || "nano" # Default to nano if $EDITOR not set
 
         puts "Opening config file: #{config_path}"
@@ -36,12 +35,12 @@ module Faa::Commands
     end
 
     class Show < Faa::Commands::Config
-      def setup : Nil
+      def setup_ : Nil
         @name = "show"
         @description = "Display current configuration values"
       end
 
-      def run(arguments : Cling::Arguments, options : Cling::Options) : Nil
+      def run_(arguments : Cling::Arguments, options : Cling::Options) : Nil
         config = Faa::Config.load
         puts <<-CONFIG
            Active Project Library: #{config.active_project_library_path}

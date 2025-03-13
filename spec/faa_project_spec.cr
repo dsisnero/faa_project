@@ -9,7 +9,7 @@ describe Faa do
           c.active_project_library = tmp
           c.working_project_directory = tmp
         end
-        
+
         dir = Faa::Dir.new(
           active_project_lib: config.active_project_library_path,
           working_dir: config.working_project_directory_path

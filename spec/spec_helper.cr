@@ -1,8 +1,9 @@
 require "spec"
+require "../src/faa_project"
 require "../src/faa/config"
 require "../src/faa/prompt"
 require "../src/faa/utils"
-require "./support/mock_prompt"
+require "./support/configuration/fixture_file"
 
 def with_temp_dir(path : String? = nil, &)
   path = File.join(Dir.tempdir, "#{path}#{Random.rand(0x100000000).to_s(36)}")
@@ -29,6 +30,15 @@ def with_test_config(&)
   yield test_config
 ensure
   original_config.try(&.save)
+end
+
+def run(args : Array(String), stdin : IO = IO::Memory.new, config_fixture : Configuration::FixtureFile::Fixture = :tempfile) : Faa::Context
+  Faa.main(
+    args,
+    stdout: IO::Memory.new,
+    stdin: stdin,
+    config_file: Configuration::FixtureFile.load(config_fixture)
+  )
 end
 
 def capture_stderr(&)

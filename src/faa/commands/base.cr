@@ -54,6 +54,7 @@ module Faa
       # A hook method for when the command raises an exception during execution
       def on_error(ex : Exception)
         {% if flag?(:debug) %}
+            puts "in debug mode"
           super
         {% else %}
           display.error(ex.message || "An error occurred")

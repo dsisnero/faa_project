@@ -1,7 +1,6 @@
 require "compress/zip"
 
 module Faa
-  class Error < Exception; end
 
   module Utils
     extend self
@@ -12,7 +11,7 @@ module Faa
 
       # Check if editor exists in PATH
       unless Process.find_executable(editor)
-        raise Error.new("Editor '#{editor}' not found in PATH")
+        raise "Editor '#{editor}' not found in PATH"
       end
 
       Process.run(
@@ -58,9 +57,9 @@ module Faa
         end
       end
     rescue ex : Compress::Zip::Error | File::NotFoundError
-      raise Error.new("Failed to unzip #{zip_path}: #{ex.message}")
+      raise "Failed to unzip #{zip_path}: #{ex.message}"
     rescue ex
-      raise Error.new("Failed to unzip #{zip_path}: #{ex.message}")
+      raise "Failed to unzip #{zip_path}: #{ex.message}"
     end
   end
 end

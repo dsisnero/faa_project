@@ -32,7 +32,7 @@ describe Faa::Dir do
     end
 
     it "allows custom path overrides" do
-      with_test_config do |config|
+      with_test_config do |_|
         custom_dir = Faa::Dir.new(
           active_project_lib: Path["/test/active"],
           working_dir: Path["/test/work"]
@@ -106,7 +106,7 @@ describe Faa::Dir do
 
     it "validates required arguments" do
       with_temp_dir do |tmp|
-        dir = Faa::Dir.new(active_project_lib: tmp)
+        dir = Faa::Dir.new(active_project_lib: tmp, working_dir: tmp)
 
         # Test empty city
         expect_raises(Exception, /City.*required/) do

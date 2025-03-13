@@ -9,50 +9,47 @@ module Faa
 
     include YAML::Serializable
 
-    @[YAML::Field(type: ::String)]
-    property active_project_library : String? = nil
+    property active_project_library : ::String? = nil
 
-    @[YAML::Field(type: ::String)]
-    property working_project_directory : String? = nil
+    property working_project_directory : ::String? = nil
 
-    @[YAML::Field]
-    property log_level : Log::Severity = Log::Severity::Info
-    
-    @[YAML::Field(type: ::String)]
-    property log_file : String? = nil
+    property log_level : Log::Severity = ::Log::Severity::Info
+
+    property log_file : ::String? = nil
 
     def initialize
-      @active_project_library ||= File.join(Path.home, "OneDrive - Federal Aviation Administration", "Active Project Library")
-      @working_project_directory ||= File.join(Path.home, "faa_workspace")
+      @active_project_library ||= default_active_path.to_s
+      @working_project_directory ||= default_working_path.to_s
+      @log_file ||= default_log_file_path.to_s
     end
 
     # Add helper method to get concrete paths
     def active_project_library_path
-      Path.new(@active_project_library || default_active_path)
+      Path.new(@active_project_library.not_nil!)
     end
 
     def working_project_directory_path
-      Path.new(@working_project_directory || default_working_path)
+      Path.new(@working_project_directory.not_nil!)
+    end
+
+    def log_file_path
+      if path = log_file
+        Path.new(path)
+      else
+        default_log_file_path
+      end
     end
 
     def default_active_path
-      Path.home / "OneDrive - Federal Aviation Administration" / "Active Project Library"
+      Path.new("OneDrive - Federal Aviation Administration", "Active Project Library")
     end
 
     def default_working_path
       Path.home / "faa_workspace"
     end
 
-    def default_log_dir
-      Path.new(XDG::Cache.new("faa_project").to_s).join("logs")
-    end
-
-    def log_path
-      if custom = @log_file
-        Path.new(custom)
-      else
-        XDG::Cache.new("faa_project").to_path / "logs" / "faa.log"
-      end
+    def default_log_file_path
+      Path.new(XDG.state_home) / "faa_project/logs/faa.log"
     end
 
     def self.load : Config
