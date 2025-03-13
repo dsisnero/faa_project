@@ -20,18 +20,18 @@ module Faa
     display = Display.new(stdout)
     input = Input.new(stdin, display)
     config = Configuration.init(config_file, display)
-    faa_dir = faa_dir_from_config(config).not_nil!
+    faa_dir = faa_dir_from_config(config)
 
     Context.new(
       stdout,
       config,
       display,
       input,
-      faa_dir.not_nil!
+      faa_dir
     )
   end
 
-  private def faa_dir_from_config(config : Configuration) : Dir
+  private def faa_dir_from_config(config : Configuration) : Dir?
     Dir.new(config.active_project_library_path, config.working_project_dir_path)
   end
 end

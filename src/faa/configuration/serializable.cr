@@ -4,9 +4,9 @@ module Faa
       include JSON::Serializable
 
       def initialize
-        @active_project_library ||= default_active_path.to_s
-        @working_project_dir ||= default_working_path.to_s
-        @log_file ||= default_log_file_path.to_s
+        @active_project_library = default_active_path.to_s
+        @working_project_dir = default_working_path.to_s
+        @log_file = default_log_file_path.to_s
       end
 
       property active_project_library : ::String?
@@ -17,19 +17,15 @@ module Faa
 
       # Add helper method to get concrete paths
       def active_project_library_path
-        Path.new(@active_project_library.not_nil!)
+        Path.new(@active_project_library || default_active_path.to_s)
       end
 
       def working_project_dir_path
-        Path.new(@working_project_dir.not_nil!)
+        Path.new(@working_project_dir || default_working_path.to_s)
       end
 
       def log_file_path
-        if path = log_file
-          Path.new(path)
-        else
-          default_log_file_path
-        end
+        Path.new(@log_file || default_log_file_path.to_s)
       end
 
       def default_active_path
