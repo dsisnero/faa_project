@@ -1,3 +1,5 @@
+require "../config"
+
 module Faa::Commands
   class Create < Base
     class_property prompt : Faa::Prompt = Faa::Prompt.new
@@ -98,7 +100,11 @@ module Faa::Commands
 
       title = title.to_s if title
 
-      faa_dir = Faa::Dir.new
+      config = Config.load
+      faa_dir = Faa::Dir.new(
+        active_project_lib: config.active_project_library_path,
+        working_dir: config.working_project_directory_path
+      )
       project_dir = faa_dir.find_or_create_project_dir(
         state: state,
         jcn: jcn,

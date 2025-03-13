@@ -30,9 +30,7 @@ module Faa
 
     getter working_dir : ::Path
 
-    getter(fast_find_config) { FastFind::Config.new }
-
-    property config : Config
+    getter fast_find_config : FastFind::Config
 
     protected def error(msg : ::String) : Nil
       STDERR << "» Error: " << msg << '\n'

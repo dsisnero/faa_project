@@ -23,7 +23,10 @@ describe Faa::Dir do
   describe "#initialize" do
     it "uses config defaults when no arguments given" do
       with_test_config do |config|
-        dir = Faa::Dir.new(config: config)
+        dir = Faa::Dir.new(
+          active_project_lib: config.active_project_library_path,
+          working_dir: config.working_project_directory_path
+        )
         dir.active_project_lib.should eq(config.active_project_library_path)
       end
     end
@@ -31,9 +34,8 @@ describe Faa::Dir do
     it "allows custom path overrides" do
       with_test_config do |config|
         custom_dir = Faa::Dir.new(
-          config: config,
-          active_project_lib: "/test/active",
-          working_dir: "/test/work"
+          active_project_lib: Path["/test/active"],
+          working_dir: Path["/test/work"]
         )
         custom_dir.active_project_lib.should eq(Path["/test/active"])
       end
@@ -49,7 +51,10 @@ describe Faa::Dir do
         Dir.mkdir_p(project_dir)
 
         # Test lookup with full arguments
-        dir = Faa::Dir.new(active_project_lib: tmp)
+        dir = Faa::Dir.new(
+          active_project_lib: Path[tmp],
+          working_dir: Path[tmp]
+        )
         result = dir.find_or_create_project_dir(**project_args)
         result.path.to_s.should contain("LOC123 (Testcity)")
       end
@@ -60,7 +65,10 @@ describe Faa::Dir do
         jcn = project_args[:jcn]
         expected_path = File.join(tmp, "Utah", "OGD (Ogden)", "OGD ATCT - #{jcn}")
         Dir.exists?(expected_path).should be_false
-        dir = Faa::Dir.new(active_project_lib: tmp)
+        dir = Faa::Dir.new(
+          active_project_lib: Path[tmp],
+          working_dir: Path[tmp]
+        )
         result = dir.find_or_create_project_dir(
           **project_args(
             city: "Ogden",
@@ -78,7 +86,10 @@ describe Faa::Dir do
         jcn = project_args[:jcn]
         expected_path = File.join(tmp, "Utah", "OGD (Ogden)", "OGD ATCT - RTIR SITE PREP - #{jcn}")
         Dir.exists?(expected_path).should be_false
-        dir = Faa::Dir.new(active_project_lib: tmp)
+        dir = Faa::Dir.new(
+          active_project_lib: Path[tmp],
+          working_dir: Path[tmp]
+        )
         result = dir.find_or_create_project_dir(
           **project_args(
             city: "Ogden",
