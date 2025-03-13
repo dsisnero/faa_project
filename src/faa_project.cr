@@ -19,7 +19,15 @@ module Faa
   private def build_context(stdin : IO, stdout : IO, config_file : Configuration::AbstractFile) : Context
     display = Display.new(stdout)
     input = Input.new(stdin, display)
+    begin
     config = Configuration.init(config_file, display)
+    rescue
+      display.error("problem reading #{config_file}")
+      display.error("erasing contents")
+      config_file.write("")
+      display.error("run 'faa_project config edit'")
+      Faa.exit!
+    end
     faa_dir = faa_dir_from_config(config)
 
     Context.new(
