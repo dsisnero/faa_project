@@ -48,3 +48,16 @@ def with_temp_env(key, value, &)
 ensure
   ENV[key] = original
 end
+
+def run(args : Array(String), input : String = "") : Faa::Context
+  stdout = IO::Memory.new
+  stdin = IO::Memory.new(input)
+  config_file = Configuration::TestConfig.new
+
+  Faa.main(
+    args: args,
+    stdout: stdout,
+    stdin: stdin,
+    config_file: config_file
+  )
+end

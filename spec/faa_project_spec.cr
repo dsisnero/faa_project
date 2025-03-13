@@ -12,7 +12,9 @@ describe Faa do
       context = run([] of String)
 
       # Verify default paths are set
-      context.config.active_project_library_path.should eq(context.config.serialisable.default_active_path)
+      context.config.active_project_library_path.should eq(
+        Path["OneDrive - Federal Aviation Administration", "Active Project Library"]
+      )
       context.config.working_project_dir_path.should eq(context.config.serialisable.default_working_path)
       context.stdout.to_s.should be_empty
     end
