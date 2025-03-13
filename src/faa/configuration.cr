@@ -33,14 +33,14 @@ module Faa
 
     delegate :active_project_library,
       :active_project_library_path,
-      :working_project_directory,
-      :working_project_directory_path,
+      :working_project_dir,
+      :working_project_dir_path,
       :log_file_path,
       to: @serialisable
 
-    def overwrite!(active_project_library : String, working_project_directory : String)
+    def overwrite!(active_project_library : String, working_project_dir : String)
       @serialisable.active_project_library = active_project_library
-      @serialisable.working_project_directory = working_project_directory
+      @serialisable.working_project_dir = working_project_dir
       save!
     end
 

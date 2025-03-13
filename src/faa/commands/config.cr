@@ -44,7 +44,7 @@ module Faa::Commands
         config = Faa::Config.load
         puts <<-CONFIG
            Active Project Library: #{config.active_project_library_path}
-           Working Directory: #{config.working_project_directory_path}
+           Working Directory: #{config.working_project_dir_path}
            CONFIG
       end
     end

@@ -20,7 +20,7 @@ describe Faa::Configuration do
     it "loads valid configuration from existing file" do
       valid_config = {
         active_project_library: "/custom/active",
-        working_project_directory: "/custom/work",
+        working_project_dir: "/custom/work",
         log_file: "/custom/log.log"
       }.to_json
       File.write(Faa::Configuration::File::CONFIG_PATH, valid_config)
@@ -30,7 +30,7 @@ describe Faa::Configuration do
       config = Faa::Configuration.init(Faa::Configuration::File.new, display)
 
       config.active_project_library_path.should eq(Path["/custom/active"])
-      config.working_project_directory_path.should eq(Path["/custom/work"])
+      config.working_project_dir_path.should eq(Path["/custom/work"])
       config.log_file_path.should eq(Path["/custom/log.log"])
       io.to_s.should be_empty
     end
@@ -98,12 +98,12 @@ describe Faa::Configuration do
     it "uses configured paths when available" do
       serialisable = Faa::Configuration::Serialisable.from_json({
         active_project_library: "/custom/active",
-        working_project_directory: "/custom/work",
+        working_project_dir: "/custom/work",
         log_file: "/custom/log.log"
       }.to_json)
       
       serialisable.active_project_library_path.should eq(Path["/custom/active"])
-      serialisable.working_project_directory_path.should eq(Path["/custom/work"])
+      serialisable.working_project_dir_path.should eq(Path["/custom/work"])
       serialisable.log_file_path.should eq(Path["/custom/log.log"])
     end
   end

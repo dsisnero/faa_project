@@ -5,12 +5,12 @@ module Faa
 
       def initialize
         @active_project_library ||= default_active_path.to_s
-        @working_project_directory ||= default_working_path.to_s
+        @working_project_dir ||= default_working_path.to_s
         @log_file ||= default_log_file_path.to_s
       end
 
       property active_project_library : ::String?
-      property working_project_directory : ::String?
+      property working_project_dir : ::String?
 
       @[JSON::Field(emit_null: true)]
       property log_file : ::String?
@@ -20,8 +20,8 @@ module Faa
         Path.new(@active_project_library.not_nil!)
       end
 
-      def working_project_directory_path
-        Path.new(@working_project_directory.not_nil!)
+      def working_project_dir_path
+        Path.new(@working_project_dir.not_nil!)
       end
 
       def log_file_path

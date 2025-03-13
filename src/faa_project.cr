@@ -32,7 +32,7 @@ module Faa
   end
 
   private def faa_dir_from_config(config : Configuration) : Dir
-    Dir.new(config.active_project_library_path, config.working_project_directory_path)
+    Dir.new(config.active_project_library_path, config.working_project_dir_path)
   end
 end
 
