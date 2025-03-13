@@ -20,7 +20,6 @@ module Faa
     display = Display.new(stdout)
     input = Input.new(stdin, display)
     config = Configuration.init(config_file, display)
-    config.save!
     faa_dir = faa_dir_from_config(config).not_nil!
 
     Context.new(
