@@ -9,8 +9,8 @@ module Faa
         @log_file ||= default_log_file_path.to_s
       end
 
-      getter active_project_library : ::String?
-      getter working_project_directory : ::String?
+      property active_project_library : ::String?
+      property working_project_directory : ::String?
 
       @[JSON::Field(emit_null: true)]
       property log_file : ::String?

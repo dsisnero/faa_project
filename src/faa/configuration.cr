@@ -27,17 +27,20 @@ module Faa
       end || new(file)
     end
 
+    getter serialisable : Serialisable
+    
     def initialize(@file : Configuration::AbstractFile, @serialisable = Serialisable.new); end
 
     delegate :active_project_library,
       :active_project_library_path,
       :working_project_directory,
       :working_project_directory_path,
+      :log_file_path,
       to: @serialisable
 
     def overwrite!(active_project_library : String, working_project_directory : String)
-      self.active_project_library = active_project_library
-      access_token.working_project_directory = working_project_directory
+      @serialisable.active_project_library = active_project_library
+      @serialisable.working_project_directory = working_project_directory
       save!
     end
 
