@@ -1,12 +1,51 @@
-module Faa
-  ROOT = Path.new(__DIR__).parent
+require "json"
+require "./faa/**"
 
-  PROJECT_LIB = ROOT / "project_lib"
+
+module Faa
+  extend self
+
+  def main(args : Array(::String), stdin : IO, stdout : IO, config_file : Configuration::AbstractFile) : Context
+    build_context(stdin, stdout, config_file).tap do |context|
+      Commands::Main.new(context).execute(args)
+    end
+  ensure
+    config_file.close
+  end
+
+  def exit! : NoReturn
+    raise(Cling::ExitProgram.new(0))
+  end
+
+  private def build_context(stdin : IO, stdout : IO, config_file : Configuration::AbstractFile) : Context
+    display = Display.new(stdout)
+    input = Input.new(stdin, display)
+    config = Configuration.init(config_file, display)
+    project_dir = project_dir_from_config(config)
+
+    Context.new(
+      stdout,
+      config,
+      display,
+      input,
+      project_dir
+    )
+  end
+
+  private def project_dir_from_config(config : Configuration) : Dir
+    Dir.new(config.active_project_library_path, config.working_project_directory_path)
+  end
 end
 
-require "./faa/dir"
-require "./faa/utils"
-require "./faa/app"
+{% unless flag?(:test) %}
+  {% if flag?(:debug) %}
+    #Faa::Debug.setup
+  {% end %}
 
-# Main entry point for the application
-Faa::App.run
+  Faa.main(
+    args: ARGV,
+    stdout: STDOUT,
+    stdin: STDIN,
+    config_file: Faa::Configuration::File.new
+  )
+{% end %}

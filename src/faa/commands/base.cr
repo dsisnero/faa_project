@@ -1,177 +1,116 @@
-require "term-prompt"
+require "cling"
+require "./help"
 
 module Faa
   module Commands
-    # Base class for command prompts
-    class Prompt
-      def ask(question : String, required : Bool = false) : String
-        print "#{question} "
-        answer = gets.try(&.strip) || ""
-        
-        if required && answer.empty?
-          raise "Required field cannot be empty"
-        end
-        
-        answer
-      end
-    end
-
     abstract class Base < Cling::Command
-      getter(prompt) { Term::Prompt.new }
-
-      def initialize
-        super
-
-        @inherit_options = true
-        @debug = false
-        add_option "debug", description: "print debug information"
-        add_option "no-color", description: "disable ansi color codes"
-        add_option 'h', "help", description: "get help information"
+      def initialize(@context : Context)
+        super(stdout: @context.stdout)
       end
 
-      def help_template : String
-        String.build do |io|
-          io << "Usage".colorize.blue << '\n'
-          @usage.each do |use|
-            io << "• " << use << '\n'
-          end
-          io << '\n'
+      getter context : Context
+      delegate client, config, current, stdout, display, input, to: context
 
-          unless @children.empty?
-            io << "Commands".colorize.blue << '\n'
-            max_size = 4 + @children.keys.max_of &.size
+      abstract def setup_
+      abstract def run_(arguments : Cling::Arguments, options : Cling::Options)
 
-            @children.each do |name, command|
-              io << "• " << name.colorize.bold
-              if summary = command.summary
-                io << " " * (max_size - name.size)
-                io << summary
-              end
-              io << '\n'
-            end
-
-            io << '\n'
-          end
-
-          io << "Options".colorize.blue << '\n'
-          max_size = 4 + @options.each.max_of { |name, opt| name.size + (opt.short ? 2 : 0) }
-
-          @options.each do |name, option|
-            if short = option.short
-              io << '-' << short << ", "
-            end
-            io << "--" << name
-
-            if description = option.description
-              name_size = name.size + (option.short ? 4 : 0)
-              io << " " * (max_size - name_size)
-              io << description
-            end
-            io << '\n'
-          end
-          io << '\n'
-
-          io << "Description".colorize.blue << '\n'
-          io << @description
+      # overrides Cling::Command#add_commands
+      def add_commands(*commands : Base.class)
+        commands.each do |klass|
+          add_command(klass.new(context))
         end
+      end
+
+      # override this to extend `pre_run` behaviour
+      def before_run(arguments : Cling::Arguments, options : Cling::Options) : Bool
+        true
+      end
+
+      def setup : Nil
+        setup_
+
+        help_command = Help.new(stdout)
+        add_option long: "no-colour", description: "Disable ANSI colours"
+        add_option 'h', help_command.name, description: help_command.description
+        add_command(help_command)
       end
 
       def pre_run(arguments : Cling::Arguments, options : Cling::Options) : Nil
-        @debug = true if options.has? "debug"
-        Colorize.enabled = false if options.has? "no-color"
+        handle_maybe_no_colour(options)
 
-        if options.has? "help"
-          stdout.puts help_template
-          exit 0
-        end
+        return if help?(arguments, options)
+
+        before_run(arguments, options)
       end
 
- protected def puts : Nil
-      stdout.puts
-    end
-
-    protected def puts(msg : String) : Nil
-      stdout.puts msg
-    end
-
-    protected def info(msg : String) : Nil
-      stdout << "» " << msg << '\n'
-    end
-
-    protected def success(msg : String) : Nil
-      stdout << "» Success".colorize.green << ": " << msg << '\n'
-    end
-
-    protected def warn(msg : String) : Nil
-      stdout << "» Warning".colorize.yellow << ": " << msg << '\n'
-    end
-
-    protected def warn(*args : String) : Nil
-      stdout << "» Warning".colorize.yellow << ": " << args[0] << '\n'
-      args[1..].each { |arg| stdout << "»  ".colorize.yellow << arg << '\n' }
-    end
-
-    protected def error(msg : String) : Nil
-      stderr << "» Error".colorize.red << ": " << msg << '\n'
-    end
-
-    protected def error(*args : String) : Nil
-      stderr << "» Error".colorize.red << ": " << args[0] << '\n'
-      args[1..].each { |arg| stderr << "»  ".colorize.red << arg << '\n' }
-    end
-
-    protected def fatal(*args : String) : NoReturn
-      error *args
-      exit_program
-    end
-
-      def on_error(ex : Exception)
-        case ex
-        when Cling::CommandError
-          error ex.message
-          error "See '#{"project_dir --help".colorize.blue}' for more information"
-        when Faa::Error
-          error ex.message
-          # TODO: "See 'project_dir help query' for more information"
+      def run(arguments : Cling::Arguments, options : Cling::Options) : Nil
+        if help?(arguments, options)
+          help_command.run(arguments, options)
         else
-          error "Unexpected exception:"
-          error ex.message
-          error "Please report this on the project_dir GitHub issues:"
-          error "https://github.com/dsisnero/project_dir/issues"
+          run_(arguments, options)
         end
-
-        if @debug
-          debug "loading stack trace..."
-
-          stack = ex.backtrace || %w[???]
-          stack.each { |line| debug " " + line }
-        end
-
-        exit 1
       end
 
-      def on_missing_arguments(args : Array(String))
-        command = "project_dir #{name} --help".colorize.blue
-        error "Missing required argument#{"s" if args.size > 1}:"
-        error " #{args.join(", ")}"
-        error "See '#{command}' for more information"
-        exit 1
+      # A hook method for when the command raises an exception during execution
+      def on_error(ex : Exception)
+        {% if flag?(:debug) %}
+          super
+        {% else %}
+          display.error(ex.message || "An error occurred")
+          stdout.puts help_template
+          TandaCLI.exit!
+        {% end %}
       end
 
-      def on_unknown_arguments(args : Array(String))
-        command = %(project_dir #{name == "main" ? "" : name + " "}--help).colorize.blue
-        error "Unexpected argument#{"s" if args.size > 1} for this command:"
-        error " #{args.join ", "}"
-        error "See '#{command}' for more information"
-        exit 1
+      # A hook method for when the command receives missing arguments during execution
+      def on_missing_arguments(arguments : Array(String))
+        display.error("Missing required argument#{"s" if arguments.size > 1}: #{arguments.join(", ")}")
+        stdout.puts help_template
+        TandaCLI.exit!
       end
 
+      # A hook method for when the command receives unknown arguments during execution
+      def on_unknown_arguments(arguments : Array(String))
+        display.error("Unknown argument#{"s" if arguments.size > 1}: #{arguments.join(", ")}")
+        stdout.puts help_template
+        TandaCLI.exit!
+      end
+
+      # A hook method for when the command receives an invalid option, for example, a value given to
+      # an option that takes no arguments
+      def on_invalid_option(message : String)
+        display.error(message)
+        stdout.puts help_template
+        TandaCLI.exit!
+      end
+
+      # A hook method for when the command receives missing options that are required during
+      # execution
+      def on_missing_options(options : Array(String))
+        display.error("Missing required option#{"s" if options.size > 1}: #{options.join(", ")}")
+        stdout.puts help_template
+        TandaCLI.exit!
+      end
+
+      # A hook method for when the command receives unknown options during execution
       def on_unknown_options(options : Array(String))
-        command = %(project_dir #{name == "main" ? "" : name + " "}--help).colorize.blue
-        error "Unexpected option#{"s" if options.size > 1} for this command:"
-        error " #{options.join ", "}"
-        error "See '#{command}' for more information"
-        exit 1
+        display.error("Unknown option#{"s" if options.size > 1}: #{options.join(", ")}")
+        stdout.puts help_template
+        TandaCLI.exit!
+      end
+
+      private def handle_maybe_no_colour(options : Cling::Options)
+        return unless options.has?("no-colour")
+
+        Colorize.enabled = false
+      end
+
+      private def help?(arguments : Cling::Arguments, options : Cling::Options) : Bool
+        arguments.has?("help") || options.has?("help")
+      end
+
+      private def help_command : Cling::Command
+        children["help"]
       end
     end
   end

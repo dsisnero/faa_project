@@ -39,7 +39,7 @@ module Faa
     def initialize(
       active_project_lib : ::Path,
       working_dir : ::Path,
-      @fast_find_config : FastFind::Config = FastFind::Config.new
+      @fast_find_config : FastFind::Config = FastFind::Config.new,
     )
       @active_project_lib = active_project_lib
       @working_dir = working_dir
