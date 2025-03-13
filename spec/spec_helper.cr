@@ -2,6 +2,30 @@ require "spec"
 require "../src/faa_project"
 require "./support/configuration/fixture_file"
 
+module Configuration
+  class TestFile < Faa::Configuration::AbstractFile
+    def initialize(@content : String? = nil)
+    end
+
+    def read : ::String?
+      @content
+    end
+
+    def write(content : ::String)
+      @content = content
+    end
+
+    def close
+      # no-op
+    end
+  end
+end
+
+def with_config(config : Hash, &)
+  test_file = Configuration::TestFile.new(config.to_json)
+  yield test_file
+end
+
 def with_temp_dir(path : String? = nil, &)
   path = File.join(Dir.tempdir, "#{path}#{Random.rand(0x100000000).to_s(36)}")
   Dir.mkdir_p(path, 0o0700)

@@ -1,6 +1,21 @@
 require "../spec_helper"
 
 describe Faa::Configuration do
+  it "initializes with provided config values" do
+    with_config({
+      active_project_library: "/test/active",
+      working_project_dir: "/test/workdir",
+      log_file: "/test/log.log"
+    }) do |test_file|
+      display = Faa::Display.new(IO::Memory.new)
+      config = Faa::Configuration.init(test_file, display)
+      
+      config.active_project_library_path.should eq(Path["/test/active"])
+      config.working_project_dir_path.should eq(Path["/test/workdir"])
+      config.log_file_path.should eq(Path["/test/log.log"])
+    end
+  end
+
   around_each do |test|
     original_config = Faa::Configuration::File::CONFIG_PATH
     test.run
