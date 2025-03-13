@@ -10,7 +10,7 @@ describe Faa do
   describe "core functionality" do
     it "initializes context with valid configuration" do
       context = run([] of String)
-      
+
       # Verify default paths are set
       context.config.active_project_library_path.should eq(context.config.serialisable.default_active_path)
       context.config.working_project_dir_path.should eq(context.config.serialisable.default_working_path)

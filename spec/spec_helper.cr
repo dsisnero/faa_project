@@ -3,7 +3,7 @@ require "../src/faa_project"
 require "./support/configuration/fixture_file"
 
 module Configuration
-  class TestFile < Faa::Configuration::AbstractFile
+  class TestConfig < Faa::Configuration::AbstractFile
     def initialize(@content : String? = nil)
     end
 
@@ -21,8 +21,16 @@ module Configuration
   end
 end
 
-def with_config(config : Hash, &)
-  test_file = Configuration::TestFile.new(config.to_json)
+def with_config(config, &)
+  with_config_file(config) do |_|
+    display = Faa::Display.new(IO::Memory.new)
+    config = Faa::Configuration.init(test_file, display)
+    yield config
+  end
+end
+
+def with_config_file(config : Hash, &)
+  test_file = Configuration::TestConfig.new(config.to_json)
   yield test_file
 end
 
@@ -39,42 +47,4 @@ def with_temp_env(key, value, &)
   yield
 ensure
   ENV[key] = original
-end
-
-def run(args : Array(String), stdin : IO = IO::Memory.new, config_fixture : Configuration::FixtureFile::Fixture = :tempfile) : Faa::Context
-  Faa.main(
-    args,
-    stdout: IO::Memory.new,
-    stdin: stdin,
-    config_file: Configuration::FixtureFile.load(config_fixture)
-  )
-end
-
-def capture_stderr(&)
-  # Create a pipe for capturing output
-  reader, writer = IO.pipe
-  original_stderr = STDERR.dup
-
-  # Redirect stderr to our pipe writer
-  STDERR.reopen(writer)
-  yield
-
-  # Close writer and read output
-  writer.close
-  reader.gets_to_end
-ensure
-  # Restore original stderr
-  STDERR.reopen(original_stderr.not_nil!)
-  reader.try(&.close)
-  writer.try(&.close)
-end
-
-def capture_exit_code(&)
-  exit_code = 0
-  begin
-    yield
-  rescue ex : ::Exception
-    exit_code = ex.message
-  end
-  exit_code
 end
