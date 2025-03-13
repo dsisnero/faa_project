@@ -3,7 +3,7 @@ require "./spec_helper"
 describe Faa do
   describe "core functionality" do
     it "initializes context with valid configuration" do
-      context = run([])
+      context = run([] of String)
       context.config.should be_a(Faa::Configuration)
       context.stdout.to_s.should be_empty
     end
