@@ -1,22 +1,27 @@
 require "./spec_helper"
 
 describe Faa do
-  around_each do |test|
-    original_config = Faa::Configuration::File::CONFIG_PATH
-    test.run
-    FileUtils.rm_rf(original_config) if File.exists?(original_config)
-  end
 
   describe "core functionality" do
     it "initializes context with valid configuration" do
-      context = run([] of String)
+      with_config_file({
+        "active_project_library": "activelib",
+        "working_project_dir": "workinglib",
+        "log_file": "logfile"
+      }) do |fixture|
+       
+
+      context = run_with_config([] of String, config_fixture: fixture)
+
+      pp! context
 
       # Verify default paths are set
       context.config.active_project_library_path.should eq(
-        Path["OneDrive - Federal Aviation Administration", "Active Project Library"]
+        Path["activelib"]
       )
-      context.config.working_project_dir_path.should eq(context.config.serialisable.default_working_path)
-      context.stdout.to_s.should be_empty
+      context.config.working_project_dir_path.should eq(Path["workinglib"])
+      context.stdout.to_s.should contain "A CLI tool for working with Faa Projects"
+      end
     end
 
     it "handles invalid arguments in main command" do
