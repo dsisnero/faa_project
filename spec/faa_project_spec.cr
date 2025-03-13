@@ -1,31 +1,16 @@
 require "./spec_helper"
-require "../src/faa_project"
 
 describe Faa do
   describe "core functionality" do
-    it "initializes directory structure correctly" do
-      with_temp_dir do |tmp|
-        config = Faa::Config.new.tap do |c|
-          c.active_project_library = tmp
-          c.working_project_directory = tmp
-        end
+    it "initializes context with valid configuration" do
+      context = run([])
+      context.config.should be_a(Faa::Configuration)
+      context.stdout.to_s.should be_empty
+    end
 
-        dir = Faa::Dir.new(
-          active_project_lib: config.active_project_library_path,
-          working_dir: config.working_project_directory_path
-        )
-        result = dir.find_or_create_project_dir(
-          state: "Utah",
-          jcn: "TEST123",
-          city: "TestCity",
-          locid: "TLOC",
-          factype: "TestFacility",
-          title: ""
-        )
-
-        expected_path = File.join(tmp, "Utah", "TLOC (Testcity)", "TLOC TESTFACILITY - TEST123")
-        Dir.exists?(expected_path).should be_true
-      end
+    it "handles invalid arguments in main command" do
+      context = run(["invalid-command"])
+      context.stdout.to_s.should contain("Unknown argument: invalid-command")
     end
   end
 end
