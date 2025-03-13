@@ -1,9 +1,16 @@
+# XDG-related directories
+/.config/
+/.cache/
+/.local/
+/.state/
+
 docs/
 lib/
 /bin/
 /.shards/
 *.dwarf
 .aider*
-src/logs/faa_project.log
+/logs/
+/tmp/
 d:/tmp/completion.log
 .envrc
