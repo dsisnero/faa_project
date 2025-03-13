@@ -82,7 +82,7 @@ describe Faa::Configuration do
       saved_content = File.read(Faa::Configuration::File::CONFIG_PATH)
       saved_config = Faa::Configuration::Serialisable.from_json(saved_content)
       saved_config.active_project_library_path.should eq(new_active)
-      saved_config.working_project_directory_path.should eq(new_work)
+      saved_config.working_project_dir_path.should eq(new_work)
     end
   end
 

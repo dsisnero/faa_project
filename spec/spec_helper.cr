@@ -1,8 +1,5 @@
 require "spec"
 require "../src/faa_project"
-require "../src/faa/config"
-require "../src/faa/prompt"
-require "../src/faa/utils"
 require "./support/configuration/fixture_file"
 
 def with_temp_dir(path : String? = nil, &)
@@ -18,18 +15,6 @@ def with_temp_env(key, value, &)
   yield
 ensure
   ENV[key] = original
-end
-
-# Mock the Faa::Config.load to use test directory
-def with_test_config(&)
-  original_config = Faa::Config.load
-  test_config = Faa::Config.new
-  test_config.working_project_directory = Dir.tempdir
-  test_config.active_project_library = Dir.tempdir
-
-  yield test_config
-ensure
-  original_config.try(&.save)
 end
 
 def run(args : Array(String), stdin : IO = IO::Memory.new, config_fixture : Configuration::FixtureFile::Fixture = :tempfile) : Faa::Context
@@ -69,8 +54,3 @@ def capture_exit_code(&)
   end
   exit_code
 end
-
-require "./faa/dir_spec"
-require "./faa/utils_spec"
-require "./faa/config_spec"
-require "./faa/create_spec"
