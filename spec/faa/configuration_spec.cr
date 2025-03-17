@@ -50,22 +50,17 @@ describe Faa::Configuration do
       io.to_s.should be_empty
     end
 
-    it "handles invalid JSON with error display and user fallback" do
+    it "handles invalid JSON with error display and fallback message" do
       File.write(Faa::Configuration::File::CONFIG_PATH, "{invalid}")
 
       io = IO::Memory.new
       display = Faa::Display.new(io)
-
-      # Simulate user pressing enter to accept defaults
-      stdin = IO::Memory.new("\n")
+      
       config = Faa::Configuration.init(Faa::Configuration::File.new, display)
 
-      # Verify error display
       io.to_s.should contain("Invalid Config!")
-      io.to_s.should contain("JSON::ParseException")
-      io.to_s.should contain("Press enter if you want to proceed with a default config")
-
-      # Verify fallback to default config
+      io.to_s.should contain("Please run 'faa_project config edit'")
+      io.to_s.should contain("Using default configuration")
       config.active_project_library_path.should eq(config.serialisable.default_active_path)
     end
 
