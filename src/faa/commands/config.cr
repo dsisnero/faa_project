@@ -53,32 +53,21 @@ module Faa::Commands
       private def edit_interactively
         current_config = context.config
 
-        # Get new values from user input
-        active_path = context.input.request(
-          "Active Project Library path: [#{current_config.active_project_library_path}]",
-          Display::Type::Info
-        )
+        # Get validated values from user input
+        active_path = prompt_with_validation(
+          "Active Project Library path",
+          current_config.active_project_library_path
+        ) { |path| validate_directory(path, "Active Project Library") }
         
-        working_path = context.input.request(
-          "Working Directory path: [#{current_config.working_project_dir_path}]",
-          Display::Type::Info
-        )
+        working_path = prompt_with_validation(
+          "Working Directory path",
+          current_config.working_project_dir_path
+        ) { |path| validate_directory(path, "Working Directory") }
         
-        log_path = context.input.request(
-          "Log file path: [#{current_config.log_file_path}]",
-          Display::Type::Info
-        )
-
-        # Use existing values if user provided empty input
-        active_path = active_path.presence || current_config.active_project_library
-        working_path = working_path.presence || current_config.working_project_dir
-        log_path = log_path.presence || current_config.log_file_path.to_s
-
-        # Validate input - all fields are required
-        if active_path.nil? || working_path.nil? || log_path.nil?
-          context.display.error("Invalid input - all fields are required")
-          return
-        end
+        log_path = prompt_with_validation(
+          "Log file path",
+          current_config.log_file_path
+        ) { |path| validate_parent_dir(path, "Log file") }
 
         # Update configuration
         current_config.overwrite!(active_path, working_path)
@@ -93,6 +82,60 @@ module Faa::Commands
         @description = "Edit configuration file interactively or with external editor"
         
         add_option 'e', "editor", description: "Open in external editor instead of interactive mode"
+      end
+
+      private def prompt_with_validation(label : String, current : Path, &validator : String -> Bool) : String
+        loop do
+          input = context.input.request(
+            "#{label}: [#{current}]",  # Clearer prompt format
+            Display::Type::INFO        # Ensure correct enum value
+          ).strip
+
+          value = input.empty? ? current.to_s : input
+          
+          if validator.call(value)
+            return value
+          end
+        end
+      end
+
+      private def validate_directory(path : String, name : String) : Bool
+        if Dir.exists?(path)
+          true
+        else
+          context.display.warning("#{name} directory does not exist: #{path}")
+          if context.input.yes?("Create directory now?")
+            begin
+              Dir.mkdir_p(path)
+              true
+            rescue ex
+              context.display.error("Failed to create directory: #{ex.message}")
+              false
+            end
+          else
+            false
+          end
+        end
+      end
+
+      private def validate_parent_dir(path : String, name : String) : Bool
+        parent = File.dirname(path)
+        if Dir.exists?(parent)
+          true
+        else
+          context.display.warning("Parent directory does not exist: #{parent}")
+          if context.input.yes?("Create parent directory for #{name}?")
+            begin
+              Dir.mkdir_p(parent)
+              true
+            rescue ex
+              context.display.error("Failed to create directory: #{ex.message}")
+              false
+            end
+          else
+            false
+          end
+        end
       end
     end
 
