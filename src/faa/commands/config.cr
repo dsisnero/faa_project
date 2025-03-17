@@ -30,7 +30,7 @@ module Faa::Commands
 
       private def edit_with_external_editor
         config_file = Faa::Configuration::File.new
-        config_path = config_file.CONFIG_PATH.to_s
+        config_path = config_file.config_path.to_s
         
         # Create file if missing
         unless ::File.exists?(config_path)
