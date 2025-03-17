@@ -21,7 +21,7 @@ module Faa
             sub_errors << "Press Ctrl+C to cancel"
           end
 
-          if gets.chomp.empty? # User pressed Enter
+          if (input = gets) && input.chomp.empty? # User pressed Enter
             # Ensure file exists
             file.write(Serialisable.new.to_json) unless file.read.presence
             
