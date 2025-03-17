@@ -1,6 +1,29 @@
+require "term-prompt"
+
 module Faa
   class Input
-    def initialize(@stdin : IO, @display : Display); end
+    @prompt : Term::Prompt
+
+    def initialize(@stdin : IO, @display : Display)
+      @prompt = Term::Prompt.new(
+        input: @stdin,
+        output: @display.stdout,
+        symbols: {
+          :success => "✓",
+          :error   => "✗",
+          :warning => "⚠",
+          :info    => "➤"
+        }
+      )
+    end
+
+    def yes?(question : String) : Bool
+      @prompt.yes?(question)
+    end
+
+    def no?(question : String) : Bool
+      @prompt.no?(question)
+    end
 
     def request(message : String, display_type : Display::Type? = nil, sensitive : Bool = false) : String?
       case display_type

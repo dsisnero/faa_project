@@ -70,3 +70,8 @@ def run(args : Array(String), stdin : IO = IO::Memory.new, config_fixture : Conf
     config_file: Configuration::FixtureFile.load(config_fixture)
   )
 end
+
+def create_input(stdin : IO = IO::Memory.new, stdout : IO = IO::Memory.new)
+  display = Faa::Display.new(stdout)
+  Faa::Input.new(stdin, display)
+end
