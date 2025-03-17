@@ -16,13 +16,30 @@ module Faa
           raise(ex)
         {% else %}
           reason = "#{ex.class}: #{ex.message.try(&.split("\n").first)}"
-          # TODO: Better handle this potential once-off case
           display.error("Invalid Config!", reason) do |sub_errors|
-            sub_errors << "If you want to try and fix the config manually press Ctrl+C to quit\n"
-            sub_errors << "Press enter if you want to proceed with a default config (this will override the existing config)"
+            sub_errors << "Press Enter to edit config now"
+            sub_errors << "Press Ctrl+C to cancel"
           end
-          gets # don't proceed unless user wants us to
-          new(file)
+
+          if gets.chomp.empty? # User pressed Enter
+            # Ensure file exists
+            file.write(Serialisable.new.to_json) unless file.read.presence
+            
+            # Open editor
+            editor = ENV["EDITOR"]? || "nano"
+            Process.run(
+              command: editor,
+              args: [file.is_a?(File) ? file.config_path : "config.json"],
+              input: STDIN,
+              output: STDOUT,
+              error: STDERR
+            )
+
+            # Recursively reload config after editing
+            init(file, display)
+          else
+            new(file)
+          end
         {% end %}
       rescue ex
         raise ex
