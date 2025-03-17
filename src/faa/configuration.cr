@@ -12,7 +12,7 @@ module Faa
       begin
         new(file, Serialisable.from_json(config_contents))
       rescue ex : JSON::SerializableError | JSON::ParseException
-        {% if flag?(:debug) %}
+        {% if flag?(:windows) %}
           raise(ex)
         {% else %}
           reason = "#{ex.class}: #{ex.message.try(&.split("\n").first)}"
