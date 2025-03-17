@@ -11,11 +11,16 @@ module Faa
       end
 
       def read : ::String?
+        # Create directory if missing
+        unless ::Dir.exists?(CONFIG_DIR)
+          FileUtils.mkdir_p(CONFIG_DIR)
+        end
         return unless ::File.exists?(CONFIG_PATH)
         ::File.read(CONFIG_PATH)
       end
 
       def write(content : ::String)
+        # Ensure directory exists before writing
         FileUtils.mkdir_p(CONFIG_DIR) unless ::Dir.exists?(CONFIG_DIR)
         ::File.write(CONFIG_PATH, content)
       end
