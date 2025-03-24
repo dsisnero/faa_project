@@ -100,13 +100,13 @@ module Faa::Commands
       end
 
       private def validate_directory(path : String, name : String) : Bool
-        if Dir.exists?(path)
+        if ::Dir.exists?(path)
           true
         else
           context.display.warning("#{name} directory does not exist: #{path}")
           if context.input.yes?("Create directory now?")
             begin
-              Dir.mkdir_p(path)
+              ::Dir.mkdir_p(path)
               true
             rescue ex
               context.display.error("Failed to create directory: #{ex.message}")
@@ -120,13 +120,13 @@ module Faa::Commands
 
       private def validate_parent_dir(path : String, name : String) : Bool
         parent = File.dirname(path)
-        if Dir.exists?(parent)
+        if ::Dir.exists?(parent)
           true
         else
           context.display.warning("Parent directory does not exist: #{parent}")
           if context.input.yes?("Create parent directory for #{name}?")
             begin
-              Dir.mkdir_p(parent)
+              ::Dir.mkdir_p(parent)
               true
             rescue ex
               context.display.error("Failed to create directory: #{ex.message}")
