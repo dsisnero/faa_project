@@ -13,6 +13,7 @@ module Faa
     end
 
     def initialize(@stdout : IO); end
+    getter stdout : IO
 
     def success(message : String, value : String? = nil)
       display_message(Type::Success, message, value)
