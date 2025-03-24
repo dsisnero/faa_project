@@ -7,8 +7,8 @@ module Faa
 
     def initialize(@stdin : IO, @display : Display)
       @prompt = Term::Prompt.new(
-        input: @stdin.as(IO::FileDescriptor),
-        output: @display.stdout.as(IO::FileDescriptor),
+        input: @stdin,
+        output: @display.stdout,
         symbols: {
           :success => "✓",
           :error   => "✗",
