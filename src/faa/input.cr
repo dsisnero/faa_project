@@ -1,3 +1,4 @@
+require "./display"
 require "term-prompt"
 
 module Faa
@@ -35,8 +36,6 @@ module Faa
         @display.warning(message)
       in .info?
         @display.info(message)
-      in .warning?
-        @display.warning(message)
       in .error?
         @display.error(message)
       in .fatal?
