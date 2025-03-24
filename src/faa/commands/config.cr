@@ -14,11 +14,6 @@ module Faa::Commands
     end
 
     class Edit < Faa::Commands::Config
-      def setup_ : Nil
-        @name = "edit"
-        @description = "Edit configuration file interactively"
-      end
-
       def run_(arguments : Cling::Arguments, options : Cling::Options) : Nil
         # Check if --editor flag is present
         if options.has?("editor")
@@ -88,7 +83,7 @@ module Faa::Commands
         loop do
           input = context.input.request(
             "#{label}: [#{current}]",  # Clearer prompt format
-            Display::Type::INFO        # Ensure correct enum value
+            Display::Type::Info        # Ensure correct enum value
           ).strip
 
           value = input.empty? ? current.to_s : input
