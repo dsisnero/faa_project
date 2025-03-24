@@ -3,6 +3,7 @@ module Faa
     def ask(question : String, required : Bool = false) : String
       print "#{question} "
       answer = gets.try(&.strip) || ""
+    end
 
     def error!(error_object : Error::Interface) : NoReturn
       error(error_object)
