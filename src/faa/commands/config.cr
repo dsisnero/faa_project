@@ -84,7 +84,7 @@ module Faa::Commands
           input = context.input.request(
             "#{label}: [#{current}]",  # Clearer prompt format
             Display::Type::Info        # Ensure correct enum value
-          ).strip
+          ).try(&.strip) || ""
 
           value = input.empty? ? current.to_s : input
           
