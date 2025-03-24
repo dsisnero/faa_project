@@ -1,4 +1,4 @@
-require "prompt"
+require "term-prompt"
 
 module Faa
   class Input
