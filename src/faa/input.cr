@@ -18,11 +18,11 @@ module Faa
     end
 
     def yes?(question : String) : Bool
-      @prompt.yes?(question)
+      !!@prompt.yes?(question)
     end
 
     def no?(question : String) : Bool
-      @prompt.no?(question)
+      !!@prompt.no?(question)
     end
 
     def request(message : String, display_type : Display::Type? = nil, sensitive : Bool = false) : String?
