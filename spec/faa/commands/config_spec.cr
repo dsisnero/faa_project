@@ -24,7 +24,7 @@ describe Faa::Commands::Config::Edit do
         )
 
         # Verify output
-        output = context.stdout.to_s
+        output = get_captured_output(context)
         output.should contain("Active Project Library path:")
         output.should contain("Working Directory path:")
         output.should contain("Log file path:")
@@ -79,7 +79,8 @@ describe Faa::Commands::Config::Edit do
         )
 
         # Verify error handling
-        context.stdout.to_s.should contain("Invalid input - all fields are required")
+        output = get_captured_output(context)
+        output.should contain("Invalid input - all fields are required")
         
         # Verify no changes persisted
         test_file.read.should be_nil

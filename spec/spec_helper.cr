@@ -54,17 +54,21 @@ end
    stdin : IO = IO::Memory.new,
    config_fixture : Configuration::TestConfig = Configuration::TestConfig.new
  ) : Faa::Context
-   # Create pipe-based IO that satisfies FileDescriptor requirement
+   # Create proper FileDescriptor pipes for both input and output
    stdout_reader, stdout_writer = IO.pipe
+   stdin_reader, stdin_writer = IO.pipe
+
+   # Write test input to the pipe and close writer
+   stdin.copy_to(stdin_writer)
+   stdin_writer.close
 
    context = Faa.main(
      args,
-     stdout: stdout_writer,  # Writer end for output
-     stdin: stdin,
+     stdout: stdout_writer,  # FileDescriptor-compatible output
+     stdin: stdin_reader,     # FileDescriptor-compatible input
      config_file: config_fixture
    )
 
-   # Return context with captured output
    context
  end
 
