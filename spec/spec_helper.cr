@@ -54,12 +54,23 @@ end
    stdin : IO = IO::Memory.new,
    config_fixture : Configuration::TestConfig = Configuration::TestConfig.new
  ) : Faa::Context
-   Faa.main(
+   # Create pipe-based IO that satisfies FileDescriptor requirement
+   stdout_reader, stdout_writer = IO.pipe
+
+   context = Faa.main(
      args,
-     stdout: IO::Memory.new,
+     stdout: stdout_writer,  # Writer end for output
      stdin: stdin,
      config_file: config_fixture
    )
+
+   # Return context with captured output
+   context
+ end
+
+ # Helper to read captured output from the context
+ def get_captured_output(context : Faa::Context) : String
+   context.stdout.as(IO::FileDescriptor).read_at_end? ? "" : context.stdout.as(IO::FileDescriptor).gets_to_end
  end
 
 def run(args : Array(String), stdin : IO = IO::Memory.new, config_fixture : Configuration::FixtureFile::Fixture = :default) : Faa::Context
