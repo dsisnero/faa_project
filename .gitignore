@@ -1,11 +1,5 @@
 # XDG-related directories
-/.config/
-/.cache/
-/.local/
-/.state/
-
 docs/
-lib/
 /bin/
 /.shards/
 *.dwarf
